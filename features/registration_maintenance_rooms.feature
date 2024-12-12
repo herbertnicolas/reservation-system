@@ -19,15 +19,7 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
     And consigo ver as salas cadastradas previamente
     And consigo ver a sala com identificador "D009", localização "Prédio E" e capacidade "50"
 
-  Scenario: Administrador tenta criar uma sala já existente
-    Given sala com identificador "D009" e localização "Prédio E" está cadastrada
-    When eu seleciono a aba "Criar Sala"
-    And crio uma sala com identificador "D009", localização "Prédio E" e capacidade "50"
-    And clico em "Confirmar Criação"
-    Then estou na página "Salas"
-    And aparece uma mensagem de erro "Sala com identificador D009 e localização Prédio E já existe!"
-    And consigo ver as salas cadastradas previamente
-    And consigo ver a sala com identificador "D009", localização "Prédio E" e capacidade "50"
+  
 
   Scenario: Administrador edita uma sala existente
     Given sala com identificador "D009" e localização "Prédio E" está cadastrada
@@ -38,7 +30,17 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
     And vejo uma mensagem de sucesso "Sala editada com sucesso!"
     And consigo ver as salas cadastradas previamente
     And consigo ver a sala com identificador "D009", localização "Prédio E" e capacidade "80"
-
+  
+  Scenario: Administrador tenta criar uma sala já existente
+    Given sala com identificador "D009" e localização "Prédio E" está cadastrada
+    When eu seleciono a aba "Criar Sala"
+    And crio uma sala com identificador "D009", localização "Prédio E" e capacidade "50"
+    And clico em "Confirmar Criação"
+    Then estou na página "Salas"
+    And aparece uma mensagem de erro "Sala com identificador D009 e localização Prédio E já existe!"
+    And consigo ver as salas cadastradas previamente
+    And consigo ver a sala com identificador "D009", localização "Prédio E" e capacidade "50"
+  
   Scenario: Administrador tenta editar uma sala não existente
     Given sala com identificador "D009" e localização "Prédio E" não está cadastrada
     When eu seleciono a aba "Editar Sala"
@@ -49,6 +51,15 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
     And consigo ver as salas cadastradas previamente
     And não vejo a sala com identificador "D009", localização "Prédio E" e capacidade "80"
 
+  Scenario: Administrador tenta remover sala não existente
+    Given sala com identificador "D009" e localização "Prédio E" não está cadastrada
+    When eu seleciono a aba "Remover Sala"
+    And clico em "Confirmar Remoção"
+    Then estou na página "Salas"
+    And vejo uma mensagem de erro "Sala com identificador D009 e localização Prédio E não existe!"
+    And consigo ver as salas cadastradas previamente
+    And não vejo a sala com identificador "D009" e localização "Prédio E"
+
   Scenario: Administrador remove sala existente
     Given sala com identificador "D009" e localização "Prédio E" está cadastrada
     When eu seleciono a aba "Remover Sala"
@@ -58,11 +69,4 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
     And consigo ver as salas cadastradas previamente
     And não vejo a sala com identificador "D009" e localização "Prédio E"
 
-  Scenario: Administrador tenta remover sala não existente
-    Given sala com identificador "D009" e localização "Prédio E" não está cadastrada
-    When eu seleciono a aba "Remover Sala"
-    And clico em "Confirmar Remoção"
-    Then estou na página "Salas"
-    And vejo uma mensagem de erro "Sala com identificador D009 e localização Prédio E não existe!"
-    And consigo ver as salas cadastradas previamente
-    And não vejo a sala com identificador "D009" e localização "Prédio E"
+
