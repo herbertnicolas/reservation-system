@@ -66,3 +66,4 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
     And vejo uma mensagem de erro "Sala com identificador D009 e localização Prédio E não existe!"
     And consigo ver as salas cadastradas previamente
     And não vejo a sala com identificador "D009" e localização "Prédio E"
+    And teste
