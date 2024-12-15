@@ -64,4 +64,5 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
 
     Scenario: Aleatorio
       Given teste
+      ajeitandoooooo teste
 
