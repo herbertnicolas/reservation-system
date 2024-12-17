@@ -67,3 +67,4 @@ Scenario: Rejeitar associação de recurso a uma sala inexistente
   Then o sistema rejeita a operação
 
 assignment_configManag_q13a_main
+a
