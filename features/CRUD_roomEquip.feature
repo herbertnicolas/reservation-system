@@ -53,13 +53,15 @@ Scenario: Editar a quantidade de um recurso existente
 Scenario: Editar um equipamento com campo de quantidade vazio
   Given eu estou na está na página "Gerenciar Recursos de Salas"
   When eu tentar editar os recursos para a sala "E233" 
-  And insiro apenas o campo de "Recurso" com "Projeto"
+  And insiro apenas o campo de "Recurso" com "Projetor"
   And seleciono a opção "Atualizar"
   Then o sistema rejeita a operação 
   And registra o erro "O campo Quantidade é obrigatório" 
   And eu posso ver que recurso o "Projetor" mantém a quantidade "2" na sala "E233"
   And eu permaneço na página "Gerenciar Recursos de Salas"
   Then ...
- 
 
-
+Scenario: Rejeitar associação de recurso a uma sala inexistente 
+  Given o sistema não tem nenhuma sala cadastrada com o identificador "D999"
+  When o administrador tenta associar o recurso "Cadeiras" com quantidade "10" à sala "D999"
+  Then o sistema rejeita a operação
