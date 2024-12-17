@@ -59,7 +59,6 @@ Scenario: Editar um equipamento com campo de quantidade vazio
   And registra o erro "O campo Quantidade é obrigatório" 
   And eu posso ver que recurso o "Projetor" mantém a quantidade "2" na sala "E233"
   And eu permaneço na página "Gerenciar Recursos de Salas"
-  Then ...
 
  
 
