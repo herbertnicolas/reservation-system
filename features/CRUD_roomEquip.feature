@@ -69,4 +69,5 @@ Scenario: Rejeitar associação de recurso a uma sala inexistente
 assignment_configManag_q13a_main
 a
 assignment_configManag_q13a_dev
+a
  
