@@ -65,3 +65,5 @@ Scenario: Rejeitar associação de recurso a uma sala inexistente
   When o administrador tenta associar o recurso "Cadeiras" com quantidade "10" à sala "D999"
   Then o sistema rejeita a operação
 
+
+
