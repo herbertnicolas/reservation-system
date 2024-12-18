@@ -59,15 +59,12 @@ Scenario: Editar um equipamento com campo de quantidade vazio
   And registra o erro "O campo Quantidade é obrigatório" 
   And eu posso ver que recurso o "Projetor" mantém a quantidade "2" na sala "E233"
   And eu permaneço na página "Gerenciar Recursos de Salas"
-  Then ...
 
 Scenario: Rejeitar associação de recurso a uma sala inexistente 
   Given o sistema não tem nenhuma sala cadastrada com o identificador "D999"
   When o administrador tenta associar o recurso "Cadeiras" com quantidade "10" à sala "D999"
   Then o sistema rejeita a operação
 
-assignment_configManag_q13a_main
-a
-assignment_configManag_q13a_dev
-a
- 
+
+
+
