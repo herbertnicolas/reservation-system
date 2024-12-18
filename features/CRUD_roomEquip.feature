@@ -67,4 +67,4 @@ Scenario: Rejeitar associação de recurso a uma sala inexistente
 
 
 
-
+a
