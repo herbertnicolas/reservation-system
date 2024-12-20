@@ -72,3 +72,4 @@ Feature: Histórico de reservas (com filtro), do componente Administradores
 
     #cenário fictício pro roteiro
     
+    #outro cenário fictício pro roteiro
