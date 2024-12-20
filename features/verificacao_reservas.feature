@@ -58,3 +58,10 @@ And eu seleciono "Confirmada"
 And eu seleciono "Aplicar Filtro"
 Then eu estou na página "Reservas"
 And eu vejo uma lista de todas as reservas com status "Confirmada"
+
+Scenario: Visualizar somente reservas canceladas
+When eu seleciono "Filtros"
+And eu seleciono "Cancelada" 
+And eu seleciono "Aplicar Filtro"
+Then eu estou na página "Reservas"
+And eu vejo uma lista de todas as reservas com status "Cancelada"
