@@ -69,3 +69,4 @@ Feature: Histórico de reservas (com filtro), do componente Administradores
     When eu seleciono em "Redefinir filtros"
     Then eu estou na página "Histórico"
     And eu consigo ver uma lista com "histórico completo"
+    #passo then fictício pro roteiro
