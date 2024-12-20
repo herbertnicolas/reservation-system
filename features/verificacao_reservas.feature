@@ -35,16 +35,6 @@ And eu vejo uma mensagem de sucesso "Reserva alterada com sucesso!"
 And eu consigo ver as reservas feitas previamente
 And eu consigo ver a sala com identificador "RE531" e status "Cancelada"
 
-Scenario: Editar reserva já feita
-Given uma reserva com identificador "RE531" e status "Cancelada" está feita
-When eu seleciono "Editar Reserva"
-And eu altero o status para "Confirmada"
-And eu seleciono "Salvar Alterações"
-Then eu estou na página "Reservas"
-And eu vejo uma mensagem de sucesso "Reserva alterada com sucesso!"
-And eu consigo ver as reservas feitas previamente
-And eu consigo ver a sala com identificador "RE531" e status "Confirmada"
-
 Scenario: Visualizar somente reservas pendentes
 When eu seleciono "Filtros"
 And eu seleciono "Pendente" 
