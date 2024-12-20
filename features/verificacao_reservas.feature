@@ -51,3 +51,10 @@ And eu seleciono "Pendente"
 And eu seleciono "Aplicar Filtro"
 Then eu estou na página "Reservas"
 And eu vejo uma lista de todas as reservas com status "Pendente"
+
+Scenario: Visualizar somente reservas confirmadas
+When eu seleciono "Filtros"
+And eu seleciono "Confirmada" 
+And eu seleciono "Aplicar Filtro"
+Then eu estou na página "Reservas"
+And eu vejo uma lista de todas as reservas com status "Confirmada"
