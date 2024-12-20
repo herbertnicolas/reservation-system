@@ -51,3 +51,4 @@ And eu seleciono "Pendente"
 And eu seleciono "Aplicar Filtro"
 Then eu estou na página "Reservas"
 And eu vejo uma lista de todas as reservas com status "Pendente"
+And eu vejo a opção de cancelar
