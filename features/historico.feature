@@ -70,3 +70,7 @@ Feature: Histórico de reservas (com filtro), do componente Administradores
     Then eu estou na página "Histórico"
     And eu consigo ver uma lista com "histórico completo"
     #passo then fictício pro roteiro
+
+    #cenário fictício pro roteiro
+    
+    #outro cenário fictício pro roteiro
