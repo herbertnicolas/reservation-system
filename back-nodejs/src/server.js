@@ -1,4 +1,5 @@
 const express = require('express');
+const { mongooseApp } = require('./database');
 const app = express();
 
 app.use(express.json());
