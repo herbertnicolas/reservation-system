@@ -1,2 +1,4 @@
 node_modules
+back-nodejs/node_modules
+front-react/node_modules
 back-nodejs/coverage/
