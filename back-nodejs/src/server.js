@@ -1,16 +1,24 @@
 const express = require('express');
-const { mongooseApp } = require('./database');
+const routes = require('./routes');
+// const { mongooseApp } = require('./database/index');
+const { connectDB } = require('./database/index');
 const app = express();
 
-app.use(express.json());
+// iniciando o banco de dados
+(async () => {
+  try {
+    await connectDB(process.env.MONGODB_URI);
+  } catch (err) {
+    console.error('Erro ao conectar ao banco de dados', err);
+  }
+})();
 
-// rota basica
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+// iniciando as rotas
+app.use(express.json());
+app.use('/api', routes); // Adicionando o prefixo '/api' para as rotas
 
 // iniciando o server
-const PORT = 3000;
+const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}!!! 🚀`);
 });
