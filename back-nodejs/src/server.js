@@ -1,5 +1,6 @@
 const express = require('express');
-const routes = require('./routes');
+const routes = require('./equipamentos.routes');
+const roomRoutes = require('./routes/salas.routes.js');
 // const { mongooseApp } = require('./database/index');
 const { connectDB } = require('./database/index');
 const app = express();
@@ -15,6 +16,7 @@ const app = express();
 
 // iniciando as rotas
 app.use(express.json());
+app.use('/salas', roomRoutes);
 app.use('/api', routes); // Adicionando o prefixo '/api' para as rotas
 
 // iniciando o server
