@@ -1,6 +1,8 @@
 const express = require('express');
-const routes = require('./routes');
-// const { mongooseApp } = require('./database/index');
+//arquivos de rotas
+const roomRoutes = require('./routes/salas.routes.js');
+const equipamentosRoutes = require('./routes/equipamentos.routes.js');
+
 const { connectDB } = require('./database/index');
 const app = express();
 
@@ -15,10 +17,15 @@ const app = express();
 
 // iniciando as rotas
 app.use(express.json());
-app.use('/api', routes); // Adicionando o prefixo '/api' para as rotas
+
+// iniciando as rotas
+app.use('/salas', roomRoutes);
+app.use('/equipamentos', equipamentosRoutes);
 
 // iniciando o server
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}!!! 🚀`);
 });
+
+module.exports = { app };
