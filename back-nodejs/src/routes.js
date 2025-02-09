@@ -1,8 +1,11 @@
-import { Router } from 'express';
+const express = require('express');
+const router = express.Router();
+const EquipamentosController = require('./controllers/Equipamentos/EquipamentosController');
 
-const routes = new Router();
-
-routes.get('/', (req, res) => {
-    res.send('Hello World!');
+// const equipmentsController = new EquipamentosController(router);
+new EquipamentosController(router);
+router.get('/', (req, res) => {
+    res.send('Hello World!!!');
 });
 
+module.exports = router;

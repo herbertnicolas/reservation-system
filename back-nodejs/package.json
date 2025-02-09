@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node src/server.js",
+    "dev": "nodemon server.js",
     "test": "env-cmd -f .env.test jest --verbose --coverage  --config ./jest.config.js --detectOpenHandles"
   },
   "author": "",
@@ -16,8 +16,8 @@
     "env-cmd": "^10.1.0",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
+    "mongoose": "^8.10.0",
     "pino": "^8.10.0",
-    "typescript": "^4.9.5",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -37,6 +37,9 @@
     "prettier": "^2.8.4",
     "supertest": "^6.3.3",
     "ts-jest": "^29.2.5",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.3"
   }
 }
