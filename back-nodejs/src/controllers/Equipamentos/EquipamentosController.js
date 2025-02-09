@@ -77,7 +77,7 @@ const reservarEquipamento = async (req, res) => {
 
 const criarEquipamento = async (req, res) => {
   try {
-    const { nome, disponibilidade } = req.body;
+    const { _id, nome, disponibilidade } = req.body;
 
     const equipamento = new Equipamento({
       nome,
