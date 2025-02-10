@@ -16,7 +16,7 @@ const removeEquipamentoFromSala = async (req, res) => {
   const { salaId, equipamentoId } = req.params;
   const { quantidade } = req.body;
 
-  if (quantidade === undefined) {
+  if (quantidade == undefined) {
     await GerEquipSala.findOneAndDelete({ salaId, equipamentoId });
     return res.status(200).json({ msg: 'Equipamento removido da sala com sucesso' });
   }
