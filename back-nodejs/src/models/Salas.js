@@ -16,7 +16,12 @@ const RoomSchema = mongoose.Schema(
             type: Number,
             required: [true, "Por favor insira o numero da sala"]
         },
+        datasReservas: {
+            type: [String],
+            required: false
+        }
     }
+
 );
 
 const Room = mongoose.model("Room", RoomSchema);
