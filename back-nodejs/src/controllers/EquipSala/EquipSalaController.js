@@ -1,4 +1,4 @@
-const GerEquipSala = require('../../models/GerEquipSala');
+const EquipSala = require('../../models/EquipSala');
 const Equipamento = require('../../models/Equipamento');
 
 const addEquipamentoToSala = async (req, res) => {
@@ -7,9 +7,9 @@ const addEquipamentoToSala = async (req, res) => {
     return res.status(400).json({ msg: 'Quantidade deve ser maior que zero' });
   }
 
-  const gerEquipSala = new GerEquipSala({ salaId, equipamentoId, quantidade });
-  await gerEquipSala.save();
-  res.status(201).json({ msg: 'Equipamento adicionado à sala com sucesso', data: gerEquipSala });
+  const equipSala = new EquipSala({ salaId, equipamentoId, quantidade });
+  await equipSala.save();
+  res.status(201).json({ msg: 'Equipamento adicionado à sala com sucesso', data: equipSala });
 };
 
 const removeEquipamentoFromSala = async (req, res) => {
@@ -17,28 +17,28 @@ const removeEquipamentoFromSala = async (req, res) => {
   const { quantidade } = req.body;
 
   if (quantidade == undefined) {
-    await GerEquipSala.findOneAndDelete({ salaId, equipamentoId });
+    await EquipSala.findOneAndDelete({ salaId, equipamentoId });
     return res.status(200).json({ msg: 'Equipamento removido da sala com sucesso' });
   }
 
-  const gerEquipSala = await GerEquipSala.findOne({ salaId, equipamentoId });
-  if (!gerEquipSala) {
+  const equipSala = await EquipSala.findOne({ salaId, equipamentoId });
+  if (!EquipSala) {
     return res.status(404).json({ msg: 'Equipamento não encontrado na sala' });
   }
 
-  if (quantidade >= gerEquipSala.quantidade) {
-    await GerEquipSala.findOneAndDelete({ salaId, equipamentoId });
+  if (quantidade >= equipSala.quantidade) {
+    await EquipSala.findOneAndDelete({ salaId, equipamentoId });
     return res.status(200).json({ msg: 'Equipamento removido da sala com sucesso' });
   }
 
-  gerEquipSala.quantidade -= quantidade;
-  await gerEquipSala.save();
-  res.status(200).json({ msg: 'Quantidade de equipamento atualizada com sucesso', data: gerEquipSala });
+  equipSala.quantidade -= quantidade;
+  await equipSala.save();
+  res.status(200).json({ msg: 'Quantidade de equipamento atualizada com sucesso', data: equipSala });
 };
 
 const getEquipamentosInSala = async (req, res) => {
   const { salaId } = req.params;
-  const equipamentos = await GerEquipSala.find({ salaId });
+  const equipamentos = await EquipSala.find({ salaId });
   res.status(200).json({ msg: 'Equipamentos listados com sucesso', data: equipamentos });
 };
 
@@ -51,17 +51,17 @@ const updateEquipamentoInSala = async (req, res) => {
   }
 
   if (quantidade === 0) {
-    await GerEquipSala.findOneAndDelete({ salaId, equipamentoId });
+    await EquipSala.findOneAndDelete({ salaId, equipamentoId });
     return res.status(200).json({ msg: 'Equipamento removido da sala com sucesso' });
   }
 
-  const gerEquipSala = await GerEquipSala.findOneAndUpdate(
+  const equipSala = await EquipSala.findOneAndUpdate(
     { salaId, equipamentoId },
     { quantidade },
     { new: true }
   );
 
-  res.status(200).json({ msg: 'Equipamento atualizado com sucesso', data: gerEquipSala });
+  res.status(200).json({ msg: 'Equipamento atualizado com sucesso', data: equipSala });
 };
 
 module.exports = {
