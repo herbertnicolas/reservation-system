@@ -1,3 +1,4 @@
+const Reserva = require("../../models/Reserva");
 const Salas = require("../../models/Salas");
 const EquipSala = require("../../models/EquipSala");
 
@@ -40,7 +41,7 @@ const getReserva = async (req, res) => {
 
 const criarReserva = async (req, res) => {
   const { tipo, equipSalaId, dataReserva, usuarioId } = req.body;
-
+  
   if (tipo === "equipamento") {
     const { equipSalaId, dataReserva, usuarioId } = req.body;
     try {
@@ -56,6 +57,7 @@ const criarReserva = async (req, res) => {
       const reserva = new Reserva({
         equipSalaId,
         dataReserva,
+        tipo,
         // usuarioId,
       });
       await reserva.save();
