@@ -1,7 +1,5 @@
-import Reserva from "../../models/Reserva";
-import Sala from "../../models/Sala";
-import Equipamento from "../../models/Equipamento";
-import EquipSala from "../../models/EquipSala";
+const Salas = require("../../models/Salas");
+const EquipSala = require("../../models/EquipSala");
 
 const getReservas = async (req, res) => {
   try {
