@@ -153,3 +153,5 @@ When(
     return true;
   }
 );
+
+module.exports = { Given, When, Then };
