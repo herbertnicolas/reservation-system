@@ -45,12 +45,25 @@ const criarReserva = async (req, res) => {
   if (tipo === "equipamento") {
     const { equipSalaId, dataReserva, usuarioId } = req.body;
     try {
+      if (!dataReserva){
+        return res.status(400).json({
+          msg: "Selecione uma data válida",
+        });
+      }
       //buscanco equipamento de uma sala
       const equipSala = await EquipSala.findById(equipSalaId);
       // verifica se está disponível na data passada
+      const dataReservaAno = dataReserva.split("/")[2];
+
       if (equipSala.datasReservas.includes(dataReserva)) {
         return res.status(400).json({
-          msg: "Equipamento já reservado para esta data",
+          msg: "Reserva indisponível para esta data",
+        });
+      }
+
+      if(dataReservaAno < new Date().getFullYear()){
+        return res.status(400).json({
+          msg: "Selecione uma data válida",
         });
       }
       // criando a reserva
