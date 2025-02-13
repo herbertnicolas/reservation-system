@@ -5,7 +5,7 @@ const {
   removeEquipamentoFromSala,
   getEquipamentosInSala,
   updateEquipamentoInSala,
-} = require('../controllers/GerEquipSala/GerEquipSalaController');
+} = require('../controllers/EquipSala/EquipSalaController');
 
 router.post('/', addEquipamentoToSala);
 router.delete('/:salaId/:equipamentoId', removeEquipamentoFromSala);
