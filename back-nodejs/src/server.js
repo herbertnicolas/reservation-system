@@ -2,6 +2,8 @@ const express = require('express');
 //arquivos de rotas
 const roomRoutes = require('./routes/salas.routes.js');
 const equipamentosRoutes = require('./routes/equipamentos.routes.js');
+const equipSalaRoutes = require('./routes/equipsala.routes.js');
+const reservasRoutes = require('./routes/reservas.routes.js');
 
 const { connectDB } = require('./database/index');
 const app = express();
@@ -15,11 +17,14 @@ const app = express();
   }
 })();
 
+// iniciando as rotas
 app.use(express.json());
 
 // iniciando as rotas
 app.use('/salas', roomRoutes);
 app.use('/equipamentos', equipamentosRoutes);
+app.use('/equipsala', equipSalaRoutes);
+app.use('/reservas', reservasRoutes);
 
 // iniciando o server
 const PORT = process.env.PORT || 3001;
