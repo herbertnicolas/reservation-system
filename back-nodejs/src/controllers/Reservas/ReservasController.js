@@ -1,7 +1,6 @@
-import Reserva from "../../models/Reserva";
-import Sala from "../../models/Sala";
-import Equipamento from "../../models/Equipamento";
-import EquipSala from "../../models/EquipSala";
+const Reserva = require("../../models/Reserva");
+const Salas = require("../../models/Salas");
+const EquipSala = require("../../models/EquipSala");
 
 const getReservas = async (req, res) => {
   try {
@@ -42,22 +41,36 @@ const getReserva = async (req, res) => {
 
 const criarReserva = async (req, res) => {
   const { tipo, equipSalaId, dataReserva, usuarioId } = req.body;
-
+  
   if (tipo === "equipamento") {
     const { equipSalaId, dataReserva, usuarioId } = req.body;
     try {
+      if (!dataReserva){
+        return res.status(400).json({
+          msg: "Selecione uma data válida",
+        });
+      }
       //buscanco equipamento de uma sala
       const equipSala = await EquipSala.findById(equipSalaId);
       // verifica se está disponível na data passada
+      const dataReservaAno = dataReserva.split("/")[2];
+
       if (equipSala.datasReservas.includes(dataReserva)) {
         return res.status(400).json({
-          msg: "Equipamento já reservado para esta data",
+          msg: "Reserva indisponível para esta data",
+        });
+      }
+
+      if(dataReservaAno < new Date().getFullYear()){
+        return res.status(400).json({
+          msg: "Selecione uma data válida",
         });
       }
       // criando a reserva
       const reserva = new Reserva({
         equipSalaId,
         dataReserva,
+        tipo,
         // usuarioId,
       });
       await reserva.save();
