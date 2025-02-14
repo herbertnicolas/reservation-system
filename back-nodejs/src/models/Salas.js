@@ -7,7 +7,7 @@ const RoomSchema = mongoose.Schema(
             required: [true, "Por favor insira o identificador da sala"]
         },
 
-        predio: {
+        localizacao: {
             type: String,
             required: [true, "Por favor insira o predio da sala"]
         },
@@ -17,7 +17,7 @@ const RoomSchema = mongoose.Schema(
             required: [true, "Por favor insira o numero da sala"]
         },
         datasReservas: {
-            type: [String],
+            type: String,
             required: false
         }
     }

@@ -4,53 +4,74 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
   Want to realizar o Cadastro e manutenção de salas (criar, editar e remover)
   So that eu possa gerenciar melhor as salas 
 
-    Background:
-      Given a sala com identificador "D005", localização "Prédio D" e capacidade "50" está cadastrada
-      And a sala com identificador "D002", localização "Prédio E" e capacidade "30" está cadastrada
-      And a sala com identificador "D005", localização "Prédio F" e capacidade "90" está cadastrada
+  Background:
+    Given as seguintes salas estão cadastradas:
+      | identificador | localização | capacidade |
+      | D005          | Prédio D    | 50         |
+      | D002          | Prédio E    | 30         |
+      | D005          | Prédio F    | 90         |
 
-    Scenario: Administrador cria nova sala
-      Given sala com identificador "D009", localização "Prédio E" e capacidade "50" não está cadastrada
-      When envio uma requisição "POST" para o endpoint "/salas" com o corpo:
-        """
-        {
+  Scenario: Criar nova sala com sucesso
+    Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" não está cadastrada
+    When envio uma requisição "POST" para o endpoint "/salas" com o corpo:
+      """
+      {
+        "identificador": "D009",
+        "localizacao": "Prédio E",
+        "capacidade": 50
+      }
+      """
+    Then o serviço responde com status "201 Created"
+    And o corpo da resposta contém:
+      """
+      {
+        "mensagem": "Sala criada com sucesso!",
+        "sala": {
           "identificador": "D009",
           "localizacao": "Prédio E",
           "capacidade": 50
         }
-        """
-      Then o serviço responde com status "201 Created"
-      And o corpo da resposta contém:
-        """
-        {
-          "mensagem": "Sala criada com sucesso!",
-          "sala": {
-            "identificador": "D009",
-            "localizacao": "Prédio E",
-            "capacidade": 50
-          }
-        }
-        """
-    Scenario: Administrador tenta criar uma sala já existente
-      Given sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
-      When envio uma requisição "POST" para o endpoint "/salas" com o corpo:
-        """
-        {
-          "identificador": "D009",
-          "localizacao": "Prédio E",
-          "capacidade": 50
-        }
-        """
-      Then o serviço responde com status "400 Bad Request"
-      And o corpo da resposta contém:
-        """
-        {
-          "erro": "Sala com identificador D009, localização Prédio E e capacidade 50 já existe!"
-        }
-        """
+      }
+      """
 
-  Scenario: Administrador edita uma sala existente
-    Given sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
+  Scenario: Tentar criar uma sala já existente
+    Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
+    When envio uma requisição "POST" para o endpoint "/salas" com o corpo:
+      """
+      {
+        "identificador": "D009",
+        "localizacao": "Prédio E",
+        "capacidade": 50
+      }
+      """
+    Then o serviço responde com status "400 Bad Request"
+    And o corpo da resposta contém:
+      """
+      {
+        "erro": "Sala com identificador D009, localização Prédio E e capacidade 50 já existe!"
+      }
+      """
+
+  Scenario: Falha ao criar sala com identificador inválido (número)
+    Given a sala com identificador "123", localização "Prédio E" e capacidade "50" não está cadastrada
+    When envio uma requisição "POST" para o endpoint "/salas" com o corpo:
+      """
+      {
+        "identificador": 123,
+        "localizacao": "Prédio E",
+        "capacidade": 50
+      }
+      """
+    Then o serviço responde com status "400 Bad Request"
+    And o corpo da resposta contém:
+      """
+      {
+        "erro": "Identificador deve ser uma string!"
+      }
+      """
+
+  Scenario: Editar uma sala existente com sucesso
+    Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
     When envio uma requisição "PUT" para o endpoint "/salas/D009" com o corpo:
       """
       {
@@ -70,8 +91,8 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
       }
       """
 
-  Scenario: Administrador edita uma sala não existente
-    Given sala com identificador "D009", localização "Prédio E" e capacidade "50" não está cadastrada
+  Scenario: Tentar editar uma sala não existente
+    Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" não está cadastrada
     When envio uma requisição "PUT" para o endpoint "/salas/D009" com o corpo:
       """
       {
@@ -86,8 +107,24 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
       }
       """
 
-  Scenario: Administrador remove sala existente
-    Given sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
+  Scenario: Falha ao editar sala com capacidade inválida (string)
+    Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
+    When envio uma requisição "PUT" para o endpoint "/salas/D009" com o corpo:
+      """
+      {
+        "capacidade": "oitenta"
+      }
+      """
+    Then o serviço responde com status "400 Bad Request"
+    And o corpo da resposta contém:
+      """
+      {
+        "erro": "Capacidade deve ser um número!"
+      }
+      """
+
+  Scenario: Remover sala existente com sucesso
+    Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
     When envio uma requisição "DELETE" para o endpoint "/salas/D009"
     Then o serviço responde com status "200 OK"
     And o corpo da resposta contém:
@@ -97,8 +134,8 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
       }
       """
 
-  Scenario: Administrador tenta remover sala não existente
-    Given sala com identificador "D009", localização "Prédio E" e capacidade "50" não está cadastrada
+  Scenario: Tentar remover sala não existente
+    Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" não está cadastrada
     When envio uma requisição "DELETE" para o endpoint "/salas/D009"
     Then o serviço responde com status "404 Not Found"
     And o corpo da resposta contém:
@@ -107,18 +144,3 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
         "erro": "Sala com identificador D009, localização Prédio E e capacidade 50 não existe!"
       }
       """
-
-  Scenario: Falha em criar nova sala por invalidação
-    Given existe um administrador cadastrado no sistema com login "Rafael" e senha "123456"
-    When o administrador envia uma requisição POST para "/salas" para tentar criar uma sala com identificador "D009", localização "Prédio E" e capacidade "cinquenta"
-    Then a requisição não é aceita, pois o valor fornecido para "capacidade" não é numérico
-    And o sistema retorna o status "400"
-    And a mensagem de erro no corpo da resposta é "Capacidade deve ser um número!"
-
-  Scenario: Falha em editar sala por invalidação
-    Given existe um administrador cadastrado no sistema com login "Rafael" e senha "123456"
-    And a sala com identificador "D009" e localização "Prédio E" e capacidade "50" já está cadastrada no sistema
-    When o administrador envia uma requisição PUT para "/salas" para tentar criar uma sala com identificador "D009", localização "Prédio E" e capacidade "oitenta"
-    Then a requisição não é aceita, pois o valor fornecido para "capacidade" não é "numérico"
-    And o sistema retorna o status "400"
-    And a mensagem de erro no corpo da resposta é "Capacidade deve ser um número!"
