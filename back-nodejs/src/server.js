@@ -11,7 +11,7 @@ const app = express();
 // iniciando o banco de dados
 (async () => {
   try {
-    await connectDB(process.env.MONGODB_URI);
+    await connectDB(process.env.MONGO_URI);
   } catch (err) {
     console.error('Erro ao conectar ao banco de dados', err);
   }
