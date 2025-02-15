@@ -75,21 +75,37 @@ const createRoom = async (req, res) => {
     }
 };
 
-const updateRoom = async (req, resp) => {
-    try {
-        const { id } = req.params;
-        const room = await Room.findByIdAndUpdate(id, req.body);
-        /*retorna o objeto antes de ser atualizado. Se eu quisesse que
-        retornasse o já atualizado, deveria usar { new: true }*/
-        if (!room){
-            return resp.status(404).json({message: `Sala com identificador ${id} não encontrada`});
-        }
-        const Updatedroom = await Room.findById(id);
-        resp.status(200).json(Updatedroom);
-    } catch (error) {
-        resp.status(500).json({message: error.message});
+const updateRoom = async (req, res) => {
+    const { id } = req.params;
+    const { capacidade } = req.body;
+    if (typeof capacidade !== 'number') {
+      return res.status(400).json({
+        erro: "Capacidade deve ser um número!",
+      });
     }
-}
+    try {
+      const room = await Room.findById(id);
+      if (!room) {
+        return res.status(404).json({
+          erro: `Sala com identificador ${id} não existe!`,
+        });
+      }
+      room.capacidade = capacidade;
+      await room.save();
+      res.status(200).json({
+        mensagem: "Sala editada com sucesso!",
+        sala: {
+          identificador: room.identificador,
+          localizacao: room.localizacao,
+          capacidade: room.capacidade,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        erro: "Erro ao editar sala",
+      });
+    }
+};
 const deleteRoom = async (req, resp) => {
     try {
         const { id } = req.params;
