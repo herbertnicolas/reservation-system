@@ -3,10 +3,8 @@ const mongoose = require('mongoose');
 const EquipSalaSchema = new mongoose.Schema({
   salaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true },
   equipamentoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Equipamento', required: true },
-  quantidade: { type: Number, required: false, min: 1 },
+  quantidade: { type: Number, required: false, min: 0 },
   datasReservas: { type: [String], default: [] }, 
 });
 
-const EquipSala = mongoose.model('EquipSala', EquipSalaSchema);
-
-module.exports = EquipSala;
+module.exports = mongoose.model('EquipSala', EquipSalaSchema);

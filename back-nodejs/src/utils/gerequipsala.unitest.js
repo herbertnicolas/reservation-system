@@ -1,9 +1,9 @@
-const { addEquipamentoToSala, removeEquipamentoFromSala, getEquipamentosInSala, updateEquipamentoInSala } = require('../controllers/EquipSala/EquipSalaController');
-const EquipSala = require('../models/EquipSala');
-const Equipamento = require('../models/Equipamento');
-const Sala = require('../models/Salas');
+const { addEquipamentoToSala, removeEquipamentoFromSala, getEquipamentosInSala, updateEquipamentoInSala } = require('../../src/controllers/GerEquipSala/GerEquipSalaController');
+const GerEquipSala = require('../../src/models/GerEquipSala');
+const Equipamento = require('../../src/models/Equipamento');
+const Sala = require('../../src/models/Salas');
 
-describe('EquipSalaController', () => {
+describe('GerEquipSalaController', () => {
   let salaId;
   let equipamentoId;
 
@@ -21,7 +21,7 @@ describe('EquipSalaController', () => {
   afterAll(async () => {
     await Sala.deleteMany({});
     await Equipamento.deleteMany({});
-    await EquipSala.deleteMany({});
+    await GerEquipSala.deleteMany({});
     await disconnectDB();
   });
 
