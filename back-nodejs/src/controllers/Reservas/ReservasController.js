@@ -50,7 +50,7 @@ const criarReserva = async (req, res) => {
           msg: "Selecione uma data válida",
         });
       }
-      //buscanco equipamento de uma sala
+      // buscando equipamento de uma sala
       const equipSala = await EquipSala.findById(equipSalaId);
       // verifica se está disponível na data passada
       const dataReservaAno = dataReserva.split("/")[2];
