@@ -1,20 +1,31 @@
-const mongoose = require("mongoose");
-const { Given, When, Then, Before, After } = require('cucumber');
+const mongoose = require('mongoose');
+const { strictEqual } = require("assert/strict");
+const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
 const request = require('supertest');
 const { app } = require('../../src/server');
 const { connectDB, disconnectDB } = require('../../src/database');
 const EquipSala = require('../../src/models/EquipSala');
 const Equipamento = require('../../src/models/Equipamento');
 const Room = require('../../src/models/Salas');
+const { getEquipSalabyName } = require('../../src/controllers/EquipSala/EquipSalaController');
 
 let server;
 let salaId;
 let equipamentoId;
 let response;
+let salaObj;
+let equipObj;
+let equipsalaObj;
+let testAddGiven;
 
 Before(async () => {
   await connectDB(process.env.MONGO_URI);
   server = app.listen(4000); // Porta diferente do ambiente normal
+  
+  await mongoose.connection.db.dropCollection("equipamentos");
+  await mongoose.connection.db.dropCollection("rooms");
+  await mongoose.connection.db.dropCollection("equipsalas");  
+  await mongoose.connection.db.dropCollection("reservas");
 });
 
 After(async () => {
@@ -47,53 +58,90 @@ Given('o sistema tem as seguintes salas e recursos cadastrados:', async function
   }
 });
 
-When('o administrador associa o recurso {string} à sala {string} com quantidade {int}', async function (recurso, sala, quantidade) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipamento = await Equipamento.findOne({ nome: recurso });
-
-  response = await request(server)
-    .post('/equipsala')
-    .send({ salaId: salaObj._id, equipamentoId: equipamento._id, quantidade });
+Given('a sala com identificador {string} está cadastrada', async function (identificador) {
+  const sala = new Room({ identificador, predio: 'Prédio A', capacidade: 30 });
+  await sala.save();
+  testAddGiven = await Room.findOne({identificador});
+  strictEqual(testAddGiven._id.toString(), sala._id.toString());
 });
 
-Then('o sistema registra o recurso {string} com quantidade {int} na sala {string}', async function (recurso, quantidade, sala) {
+Given('o recurso com nome {string} está cadastrado', async function (nome) {
+  const equipamento = new Equipamento({ nome });
+  await equipamento.save();
+  testAddGiven = await Equipamento.findOne({nome})._id;
+  strictEqual(testAddGiven, equipamento._id);
+});
+
+Given('a sala {string} tem uma reserva ativa para o recurso {string}', async function (sala, recurso) {
+  salaObj = await Room.findOne({ identificador: sala });
+  equipObj = await Equipamento.findOne({ nome: recurso });
+  if(!equipObj){ equipObj = new Equipamento({ nome: recurso }); }
+  if(!salaObj){ salaObj = new Room({ identificador: sala, predio: 'Prédio A', capacidade: 30}); }
+  
+  equipsalaObj = await EquipSala.findOne({salaId: salaObj._id, equipamentoId: equipObj._id});
+  
+  if(!equipsalaObj){
+    equipsalaObj = new EquipSala({
+      salaId: salaObj._id,
+      equipamentoId: equipObj._id,
+      datasReservas: []
+    });
+    await equipsalaObj.save();
+    
+  }
+  
+  response = await request(server)
+    .post('/reservas')
+    .send({ tipo: 'equipamento', equipSalaId: equipsalaObj._id.toString(), dataReserva: '08/03/2025' });
+
+  strictEqual(response.status, 201);
+});
+
+When('o administrador tenta associar o recurso {string} à sala {string} com quantidade {string}', async function (recurso, sala, quantidade) {
+  salaObj = await Room.findOne({ identificador: sala });
+  if(!salaObj){
+    response = await request(server)
+      .post('/equipsala')
+      .send({ salaId: null, equipamentoId: "", equipNome: recurso, quantidade});
+  }
+  else{
+    response = await request(server)
+      .post('/equipsala')
+      .send({ salaId: salaObj._id, equipamentoId: "", equipNome: recurso, quantidade});
+  }
+});
+
+Then('o sistema registra o recurso {string} com quantidade {string} na sala {string}', async function (recurso, quantidade, sala) {
   const salaObj = await Room.findOne({ identificador: sala });
   const equipamento = await Equipamento.findOne({ nome: recurso });
   const equipSala = await EquipSala.findOne({ salaId: salaObj._id, equipamentoId: equipamento._id });
 
-  expect(equipSala).not.toBeNull();
-  expect(equipSala.quantidade).toBe(quantidade);
+  strictEqual(equipSala !== null, true);
+  strictEqual(equipSala.quantidade, parseInt(quantidade));
 });
 
 Then('o recurso {string} é adicionado à base de dados de recursos disponíveis', async function (recurso) {
   const equipamento = await Equipamento.findOne({ nome: recurso });
-  expect(equipamento).not.toBeNull();
+  strictEqual(equipamento !== null, true);
 });
 
-Then('o sistema retorna a mensagem {string} com status {int}', function (mensagem, status) {
-  expect(response.status).toBe(status);
-  expect(response.body.msg).toBe(mensagem);
+Then('o sistema retorna a mensagem {string} com status {string}', async function (mensagem, status) {
+  strictEqual(response.status, parseInt(status, 10));
+  strictEqual(response.body.msg, mensagem);
 });
 
-When('o administrador remove o recurso {string} da sala {string}', async function (recurso, sala) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipamento = await Equipamento.findOne({ nome: recurso });
-
-  response = await request(server)
-    .delete(`/equipsala/${salaObj._id}/${equipamento._id}`);
-});
 
 Then('o sistema remove o recurso {string} da lista de recursos associados à sala {string}', async function (recurso, sala) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipamento = await Equipamento.findOne({ nome: recurso });
-  const equipSala = await EquipSala.findOne({ salaId: salaObj._id, equipamentoId: equipamento._id });
+  salaObj = await Room.findOne({ identificador: sala });
+  equipObj = await Equipamento.findOne({ nome: recurso });
+  equipsalaObj = await EquipSala.findOne({ salaId: salaObj._id, equipamentoId: equipObj._id });
 
-  expect(equipSala).toBeNull();
+  strictEqual(equipsalaObj, null);
 });
 
 Then('o recurso {string} permanece na base de dados geral para associações futuras', async function (recurso) {
   const equipamento = await Equipamento.findOne({ nome: recurso });
-  expect(equipamento).not.toBeNull();
+  strictEqual(equipamento !== null, true);
 });
 
 When('o administrador tenta associar o recurso {string} à sala {string} sem informar a quantidade', async function (recurso, sala) {
@@ -106,11 +154,11 @@ When('o administrador tenta associar o recurso {string} à sala {string} sem inf
 });
 
 Then('o sistema rejeita a operação', function () {
-  expect(response.status).toBe(400);
+  strictEqual(response.status, 400);
 });
 
 Then('o sistema exibe a mensagem de erro {string}', function (mensagem) {
-  expect(response.body.msg).toBe(mensagem);
+  strictEqual(response.body.msg, mensagem);
 });
 
 Then('não adiciona {string} à sala {string}', async function (recurso, sala) {
@@ -118,40 +166,19 @@ Then('não adiciona {string} à sala {string}', async function (recurso, sala) {
   const equipamento = await Equipamento.findOne({ nome: recurso });
   const equipSala = await EquipSala.findOne({ salaId: salaObj._id, equipamentoId: equipamento._id });
 
-  expect(equipSala).toBeNull();
+  strictEqual(equipSala, null);
 });
 
 When('o administrador tenta remover o recurso {string} da sala {string}', async function (recurso, sala) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipamento = await Equipamento.findOne({ nome: recurso });
+  salaObj = await Room.findOne({ identificador: sala }); 
+  equipObj = await Equipamento.findOne({ nome: recurso });  
 
   response = await request(server)
-    .delete(`/equipsala/${salaObj._id}/${equipamento._id}`);
+    .delete(`/equipsala/${salaObj._id}/${equipObj._id}`);
 });
 
-Then('o sistema rejeita a remoção', function () {
-  expect(response.status).toBe(400);
-});
-
-Then('exibe a mensagem de erro {string}', function (mensagem) {
-  expect(response.body.msg).toBe(mensagem);
-});
-
-When('o administrador tenta associar o recurso {string} com quantidade {int} à sala {string}', async function (recurso, quantidade, sala) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipamento = await Equipamento.findOne({ nome: recurso });
-
-  response = await request(server)
-    .post('/equipsala')
-    .send({ salaId: salaObj._id, equipamentoId: equipamento._id, quantidade });
-});
-
-Then('registra o erro {string}', function (mensagem) {
-  expect(response.body.msg).toBe(mensagem);
-});
-
-When('o administrador consulta os recursos da sala {string}', async function (sala) {
-  const salaObj = await Room.findOne({ identificador: sala });
+When('o administrador tenta consultar os recursos da sala {string}', async function (sala) {
+  salaObj = await Room.findOne({ identificador: sala });
 
   response = await request(server)
     .get(`/equipsala/${salaObj._id}`);
@@ -159,75 +186,23 @@ When('o administrador consulta os recursos da sala {string}', async function (sa
 
 Then('o sistema retorna a lista de recursos da sala {string}:', async function (sala, dataTable) {
   const listaRecursos = dataTable.hashes(); // Converte para array de objetos
-  const salaObj = await Room.findOne({ identificador: sala });
-
-  const equipamentos = await EquipSala.find({ salaId: salaObj._id });
-
-  listaRecursos.forEach(recurso => {
-    const equipamento = equipamentos.find(e => e.equipamentoId.toString() === recurso.Recurso);
-    expect(equipamento).not.toBeNull();
-    expect(equipamento.quantidade).toBe(parseInt(recurso.Quantidade));
+  
+  const equipamentos = response.body.data; // lista [ {Equipamento, quantidade}, ... ]
+  
+  listaRecursos.forEach( (recurso) => {
+    let equipinst = null;
+    for (let i = 0; i < equipamentos.length; i++) {
+      
+      if (equipamentos[i].equipamento.nome == recurso.Recurso && 
+        equipamentos[i].quantidade == recurso.Quantidade
+      ) {
+        equipinst = equipamentos[i];
+        break;
+      }
+    }
+    strictEqual(equipinst.equipamento.nome, recurso.Recurso);
+    strictEqual(equipinst.quantidade, parseInt(recurso.Quantidade));
   });
-});
-
-Then('o sistema retorna uma mensagem com status {int}', function (status) {
-  expect(response.status).toBe(status);
-});
-
-
-Given('uma sala com identificador {string} está cadastrada', async function (identificador) {
-  const sala = new Room({ identificador, predio: 'Prédio A', capacidade: 30 });
-  await sala.save();
-  salaId = sala._id;
-});
-
-Given('um equipamento com nome {string} está cadastrado', async function (nome) {
-  const equipamento = new Equipamento({ nome });
-  await equipamento.save();
-  equipamentoId = equipamento._id;
-});
-
-When('eu adiciono o equipamento à sala com quantidade {int}', async function (quantidade) {
-  response = await request(server)
-    .post('/equipsala')
-    .send({ salaId, equipamentoId, quantidade });
-});
-
-Then('o equipamento deve ser adicionado à sala com sucesso', function () {
-  expect(response.status).toBe(201);
-  expect(response.body.msg).toBe('Equipamento adicionado à sala com sucesso');
-});
-
-When('eu removo o equipamento da sala', async function () {
-  response = await request(server)
-    .delete(`/equipsala/${salaId}/${equipamentoId}`);
-});
-
-Then('o equipamento deve ser removido da sala com sucesso', function () {
-  expect(response.status).toBe(200);
-  expect(response.body.msg).toBe('Equipamento removido da sala com sucesso');
-});
-
-When('eu removo {int} unidades do equipamento da sala', async function (quantidade) {
-  response = await request(server)
-    .delete(`/equipsala/${salaId}/${equipamentoId}`)
-    .send({ quantidade });
-});
-
-Then('a quantidade de equipamento deve ser atualizada com sucesso', function () {
-  expect(response.status).toBe(200);
-  expect(response.body.msg).toBe('Quantidade de equipamento atualizada com sucesso');
-});
-
-When('eu listo os equipamentos da sala', async function () {
-  response = await request(server)
-    .get(`/equipsala/${salaId}`);
-});
-
-Then('os equipamentos da sala devem ser listados com sucesso', function () {
-  expect(response.status).toBe(200);
-  expect(response.body.msg).toBe('Equipamentos listados com sucesso');
-  expect(response.body.data).toContainEqual(expect.objectContaining({ _id: equipamentoId.toString() }));
 });
 
 When('eu atualizo a quantidade do equipamento na sala para {int}', async function (quantidade) {
@@ -236,12 +211,4 @@ When('eu atualizo a quantidade do equipamento na sala para {int}', async functio
     .send({ quantidade });
 });
 
-Then('o equipamento deve ser atualizado com sucesso', function () {
-  expect(response.status).toBe(200);
-  expect(response.body.msg).toBe('Equipamento atualizado com sucesso');
-  if (quantidade > 0) {
-    expect(response.body.data.quantidade).toBe(quantidade);
-  } else {
-    expect(response.body.data).toBeUndefined();
-  }
-});
+
