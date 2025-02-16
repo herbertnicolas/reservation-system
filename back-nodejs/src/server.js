@@ -4,6 +4,7 @@ const roomRoutes = require('./routes/salas.routes.js');
 const equipamentosRoutes = require('./routes/equipamentos.routes.js');
 const equipSalaRoutes = require('./routes/equipsala.routes.js');
 const reservasRoutes = require('./routes/reservas.routes.js');
+const verificarReservasRoutes = require('./routes/verificarreservas.routes.js');
 
 const { connectDB } = require('./database/index');
 const app = express();
@@ -25,6 +26,7 @@ app.use('/salas', roomRoutes);
 app.use('/equipamentos', equipamentosRoutes);
 app.use('/equipsala', equipSalaRoutes);
 app.use('/reservas', reservasRoutes);
+app.use('/verificarreservas', verificarReservasRoutes);
 
 // iniciando o server
 const PORT = process.env.PORT || 3001;
