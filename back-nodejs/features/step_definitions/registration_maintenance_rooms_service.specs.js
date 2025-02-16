@@ -2,6 +2,7 @@ const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
 const assert = require('assert');
 const request = require('supertest');
 const app = require('../../src/server').app;
+const Room = require('../../src/models/Salas');
 
 let response;
 
@@ -18,8 +19,10 @@ Given('as seguintes salas estão cadastradas:', async function (dataTable) {
 });
 
 Given('a sala com identificador {string}, localização {string} e capacidade {string} não está cadastrada', async function (identificador, localizacao, capacidade) {
-  const res = await request(app).get(`/salas/${identificador}`);
-  assert.strictEqual(res.status, 404, `A sala com identificador ${identificador} já está cadastrada.`);
+  const existingRoom = await Room.findOne({ identificador, localizacao, capacidade });
+  if(existingRoom){
+    assert.strictEqual(res.status, 404, `A sala com identificador ${identificador} e ${localizacao} já está cadastrada.`);
+  }
 });
 
 When('envio uma requisição {string} para o endpoint {string} com o corpo:', async function (method, endpoint, docString) {
