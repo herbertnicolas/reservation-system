@@ -49,3 +49,8 @@ Given('a sala com identificador {string}, localização {string} e capacidade {s
       capacidade: parseInt(capacidade),
     });
 });
+
+When('envio uma requisição {string} para o endpoint {string}', async function (method, endpoint) {
+  const url = endpoint.replace('{_id}', 'teste');
+  response = await request(app)[method.toLowerCase()](url);
+});

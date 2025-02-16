@@ -72,7 +72,7 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
 
   Scenario: Editar uma sala existente com sucesso
     Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
-    When envio uma requisição "PUT" para o endpoint "/salas/D009" com o corpo:
+    When envio uma requisição "PUT" para o endpoint "/salas/{_id}" com o corpo:
       """
       {
         "capacidade": 80
@@ -93,7 +93,7 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
 
   Scenario: Tentar editar uma sala não existente
     Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" não está cadastrada
-    When envio uma requisição "PUT" para o endpoint "/salas/D009" com o corpo:
+    When envio uma requisição "PUT" para o endpoint "/salas/{_id}" com o corpo:
       """
       {
         "capacidade": 80
@@ -109,7 +109,7 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
 
   Scenario: Falha ao editar sala com capacidade inválida (string)
     Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
-    When envio uma requisição "PUT" para o endpoint "/salas/D009" com o corpo:
+    When envio uma requisição "PUT" para o endpoint "/salas/{_id}" com o corpo:
       """
       {
         "capacidade": "oitenta"
@@ -125,7 +125,7 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
 
   Scenario: Remover sala existente com sucesso
     Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
-    When envio uma requisição "DELETE" para o endpoint "/salas/D009"
+    When envio uma requisição "DELETE" para o endpoint "/salas/{_id}"
     Then o serviço responde com status "200 OK"
     And o corpo da resposta contém:
       """
@@ -136,7 +136,7 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
 
   Scenario: Tentar remover sala não existente
     Given a sala com identificador "D009", localização "Prédio E" e capacidade "50" não está cadastrada
-    When envio uma requisição "DELETE" para o endpoint "/salas/D009"
+    When envio uma requisição "DELETE" para o endpoint "/salas/{_id}"
     Then o serviço responde com status "404 Not Found"
     And o corpo da resposta contém:
       """
