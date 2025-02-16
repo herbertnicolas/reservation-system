@@ -40,165 +40,207 @@ const getReserva = async (req, res) => {
 };
 
 const criarReserva = async (req, res) => {
-  const { tipo, equipSalaId, dataReserva, usuarioId } = req.body;
-  
-  if (tipo === "equipamento") {
-    const { equipSalaId, dataReserva, usuarioId } = req.body;
-    try {
-      if (!dataReserva){
-        return res.status(400).json({
-          msg: "Selecione uma data válida",
-        });
-      }
-      // buscando equipamento de uma sala
-      const equipSala = await EquipSala.findById(equipSalaId);
-      // verifica se está disponível na data passada
-      const dataReservaAno = dataReserva.split("/")[2];
+  try {
+    const { tipo, dataReserva, salaId, equipamentoId } = req.body;
 
-      if (equipSala.datasReservas.includes(dataReserva)) {
-        return res.status(400).json({
-          msg: "Reserva indisponível para esta data",
-        });
-      }
-
-      if(dataReservaAno < new Date().getFullYear()){
-        return res.status(400).json({
-          msg: "Selecione uma data válida",
-        });
-      }
-      // criando a reserva
-      const reserva = new Reserva({
-        equipSalaId,
-        dataReserva,
-        tipo,
-        // usuarioId,
-      });
-      await reserva.save();
-      // atualizando array de reservas no EquipSala com reserva nova
-      equipSala.datasReservas.push(dataReserva);
-      await equipSala.save();
-
-      return res.status(201).json({
-        msg: "Reserva de equipamento criada com sucesso",
-        data: reserva,
-      });
-    } catch (err) {
-      return res.status(500).json({
-        msg: "Erro ao criar reserva",
-        error: err.message,
+    // Validação básica
+    if (!tipo || !dataReserva) {
+      return res.status(400).json({ 
+        msg: "Campos obrigatórios faltando: tipo, dataReserva" 
       });
     }
-  } else if (tipo === "sala") {
 
-    try {
-      const salaId = await EquipSala.findById(equipSalaId).salaId;
-      const sala = await Sala.findById(salaId);
+    // Validação de IDs
+    if (tipo === "sala" && !salaId) {
+      return res.status(400).json({ msg: "salaId é obrigatório para reserva de sala" });
+    }
 
-      if (sala.datasReservas.includes(dataReserva)) {
-        return res.status(400).json({
-          msg: "Sala já reservada para esta data",
-        });
-      }
+    // if (tipo === "equipamento" && (!salaId || !equipamentoId)) {
+    //   return res.status(400).json({ msg: "salaId e equipamentoId são obrigatórios para reserva de equipamento" });
+    // }
 
-      const reserva = new Reserva({
+    let recurso;
+    let model;
+
+    // Lógica para reserva de SALA
+    if (tipo === "sala") {
+      // if (!mongoose.isValidObjectId(salaId)) {
+      //   return res.status(400).json({ msg: "ID da sala inválido" });
+      // }
+      
+      recurso = await Salas.findById(salaId);
+      model = Salas;
+    }
+
+    // Lógica para reserva de EQUIPAMENTO
+    if (tipo === "equipamento") {
+      // if (!mongoose.isValidObjectId(equipamentoId)) {
+      //   return res.status(400).json({ msg: "ID do equipamento inválido" });
+      // }
+
+      // Busca a relação equipamento-sala
+      recurso = await EquipSala.findOne({ 
+        salaId: salaId,
+        equipamentoId: equipamentoId
+      });
+
+      model = EquipSala;
+    }
+
+
+    if (!recurso) {
+      return res.status(404).json({ 
+        msg: tipo === "sala" ? "Salas não encontrada" : "Equipamento não encontrado nesta sala"
+      });
+    }
+
+    // Validação de formato de data (DD/MM/YYYY)
+    const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (!dataReserva.match(dateRegex)) {
+      return res.status(400).json({ msg: "Formato de data inválido. Use DD/MM/YYYY" });
+    }
+
+    // Verificar conflito de datas
+    if (recurso.datasReservas.includes(dataReserva)) {
+      return res.status(400).json({ 
+        msg: `${tipo.charAt(0).toUpperCase() + tipo.slice(1)} já reservado para esta data` 
+      });
+    }
+
+    // Criar reserva
+    const reserva = new Reserva({
+      tipo,
+      dataReserva,
+      ...(tipo === "sala" && { salaId }),
+      ...(tipo === "equipamento" && { 
+        equipSalaId: recurso._id,
         salaId,
-        dataReserva,
-        usuarioId,
-      });
+        equipamentoId 
+      })
+    });
 
-      await reserva.save();
+    // Atualizar datas reservadas
+    recurso.datasReservas.push(dataReserva);
+    await Promise.all([reserva.save(), recurso.save()]);
 
-      // Atualizar datasReservas na Sala
-      sala.datasReservas.push(dataReserva);
-      await sala.save();
+    return res.status(201).json({
+      msg: `Reserva de ${tipo} criada com sucesso`,
+      data: reserva
+    });
 
-      return res.status(201).json({
-        msg: "Reserva de sala criada com sucesso",
-        data: reserva,
-      });
-    } catch (err) {
-      return res.status(500).json({
-        msg: "Erro ao criar reserva",
-        error: err.message,
-      });
-    }
+  } catch (err) {
+    return res.status(500).json({
+      msg: "Erro ao criar reserva",
+      error: err.message
+    });
   }
 };
 
 const atualizarReserva = async (req, res) => {
   try {
     const { reservaId } = req.params;
-    const { dataReserva, usuarioId } = req.body;
+    const { dataReserva } = req.body;
 
     const reserva = await Reserva.findById(reservaId);
+    if (!reserva) return res.status(404).json({ msg: "Reserva não encontrada" });
 
-    if (!reserva) {
-      return res.status(404).json({
-        msg: "Reserva não encontrada",
-      });
+    // Determinar o recurso relacionado
+    let recurso;
+    if (reserva.tipo === "sala") {
+      recurso = await Salas.findById(reserva.salaId);
+    } else {
+      recurso = await EquipSala.findById(reserva.equipSalaId);
     }
 
-    // Verifica se a data está sendo atualizada
+    if (!recurso) return res.status(404).json({ msg: "Recurso não encontrado" });
+
+    // Atualização de data
     if (dataReserva && dataReserva !== reserva.dataReserva) {
-      let modelToUpdate;
-      let modelType;
-
-      // Determina o tipo de reserva (sala ou equipamento)
-      if (reserva.salaId) {
-        modelType = 'sala';
-        modelToUpdate = await Sala.findById(reserva.salaId);
-      } else if (reserva.equipSalaId) {
-        modelType = 'equipamento';
-        modelToUpdate = await EquipSala.findById(reserva.equipSalaId);
-      } else {
-        return res.status(400).json({
-          msg: "Reserva inválida: não vinculada a sala ou equipamento",
+      // Remover data antiga
+      recurso.datasReservas = recurso.datasReservas.filter(
+        date => date !== reserva.dataReserva
+      );
+      
+      // Verificar nova disponibilidade
+      if (recurso.datasReservas.includes(dataReserva)) {
+        return res.status(400).json({ 
+          msg: `Data ${dataReserva} já está reservada para este ${reserva.tipo}`
         });
       }
 
-      // Remove a data antiga das reservas
-      const index = modelToUpdate.datasReservas.indexOf(reserva.dataReserva);
-      if (index > -1) {
-        modelToUpdate.datasReservas.splice(index, 1);
-      }
-
-      // Verifica disponibilidade da nova data
-      if (modelToUpdate.datasReservas.includes(dataReserva)) {
-        return res.status(400).json({
-          msg: `${modelType.charAt(0).toUpperCase() + modelType.slice(1)} já reservada para esta data`,
-        });
-      }
-
-      // Atualiza com a nova data
-      modelToUpdate.datasReservas.push(dataReserva);
-      await modelToUpdate.save();
-
-      // Atualiza a data na reserva
+      recurso.datasReservas.push(dataReserva);
       reserva.dataReserva = dataReserva;
     }
 
-    // Atualiza usuário se fornecido
-    if (usuarioId !== undefined) {
-      reserva.usuarioId = usuarioId;
-    }
-
-    await reserva.save();
+    await Promise.all([reserva.save(), recurso.save()]);
 
     return res.status(200).json({
       msg: "Reserva atualizada com sucesso",
-      data: reserva,
+      data: reserva
     });
-    
+
   } catch (err) {
     return res.status(500).json({
       msg: "Erro ao atualizar reserva",
-      error: err.message,
+      error: err.message
     });
   }
 };
+
+const removerReserva = async (req, res) => {
+  try {
+    const { reservaId } = req.params;
+
+    // 1. Encontrar a reserva
+    const reserva = await Reserva.findById(reservaId);
+    if (!reserva) {
+      return res.status(404).json({ 
+        msg: "Reserva não encontrada" 
+      });
+    }
+
+    // 2. Encontrar o recurso relacionado
+    let recurso;
+    if (reserva.tipo === "sala") {
+      recurso = await Salas.findById(reserva.salaId);
+    } else {
+      recurso = await EquipSala.findById(reserva.equipSalaId);
+    }
+
+    if (!recurso) {
+      return res.status(404).json({ 
+        msg: `${reserva.tipo.charAt(0).toUpperCase() + reserva.tipo.slice(1)} não encontrado` 
+      });
+    }
+
+    // 3. Remover a data das reservas do recurso
+    recurso.datasReservas = recurso.datasReservas.filter(
+      date => date !== reserva.dataReserva
+    );
+    
+    // 4. Atualizar o recurso e excluir a reserva
+    await Promise.all([
+      recurso.save(),
+      Reserva.findByIdAndDelete(reservaId)
+    ]);
+
+    return res.status(200).json({
+      msg: "Reserva removida com sucesso",
+      data: null
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      msg: "Erro ao remover reserva",
+      error: err.message
+    });
+  }
+};
+
 module.exports = {
   getReservas,
   getReserva,
   atualizarReserva,
   criarReserva,
+  removerReserva
 };
