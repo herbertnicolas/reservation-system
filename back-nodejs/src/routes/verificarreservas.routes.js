@@ -8,6 +8,6 @@ const {
 
 router.get('/', listarReservas);
 router.get('/status/:status', filtrarReservas);
-router.put('/:id/status', modificarStatusReserva);
+router.put('/:id', modificarStatusReserva);
 
 module.exports = router;
