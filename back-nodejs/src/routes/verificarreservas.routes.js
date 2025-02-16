@@ -4,7 +4,7 @@ const {
     filtrarReservas,
     listarReservas,
     modificarStatusReserva
-} = require('../controllers/VerificarReservas/verificarreservasController');
+} = require('../controllers/Reservas/verificarreservasController');
 
 router.get('/', listarReservas);
 router.get('/status/:status', filtrarReservas);
