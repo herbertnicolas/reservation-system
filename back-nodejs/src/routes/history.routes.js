@@ -4,7 +4,7 @@ const {
   getFullHistory,
   searchHistory,
   resetFilters,
-} = require('../controllers/History/historyController');
+} = require('../controllers/historyController');
 
 // Obter todo o histórico
 router.get('/', getFullHistory);
