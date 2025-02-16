@@ -43,7 +43,6 @@ const criarEquipamento = async (req, res) => {
 
     const equipamento = new Equipamento({
       nome,
-      disponibilidade,
     });
 
     await equipamento.save();

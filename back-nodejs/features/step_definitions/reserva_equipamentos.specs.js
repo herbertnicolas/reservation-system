@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Given, When, Then, Before, After } = require("cucumber");
+const { Given, When, Then, Before, After } = require("@cucumber/cucumber");
 const request = require("supertest");
 const { app } = require("../../src/server");
 const { connectDB, disconnectDB } = require("../../src/database");
