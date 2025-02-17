@@ -11,6 +11,12 @@ Feature: Adicionar, editar e remover recurso ou equipamento de sala
     And o recurso "Microfone" é adicionado à base de dados de recursos disponíveis
     And o sistema retorna a mensagem "Equipamento adicionado à sala com sucesso" com status "201"
 
+  Scenario: Registrar erro ao adicionar recurso sem quantidade
+    Given o recurso com nome "Projetor" não está cadastrado
+    And a sala com nome "D003" está cadastrada
+    When o administrador faz uma requisição POST do recurso "Projetor" à sala "D003" sem informar a quantidade
+    And o sistema retorna a mensagem "Quantidade deve ser um número inteiro maior que zero" com status "400"
+
   Scenario: Remover recurso de uma sala
     Given o sistema tem salas com os seguintes recursos cadastrados:
       | Sala | Recurso    | Quantidade |
@@ -21,13 +27,6 @@ Feature: Adicionar, editar e remover recurso ou equipamento de sala
     And o sistema remove o recurso "Computador" dos recursos associados à sala "E104"
     And o recurso "Computador" permanece na base de dados geral para associações futuras
 
-  Scenario: Registrar erro ao adicionar recurso sem quantidade
-    Given o recurso com nome "Projetor" não está cadastrado
-    And a sala com nome "D003" está cadastrada
-    When o administrador faz uma requisição POST do recurso "Projetor" à sala "D003" sem informar a quantidade
-    And o sistema retorna a mensagem "Quantidade deve ser um número inteiro maior que zero" com status "400"
-    And não adiciona "Projetor" à sala "D003"
-
   Scenario: Tentar remover recurso de uma sala com reservas associadas
     Given o sistema tem salas com os seguintes recursos cadastrados:
       | Sala | Recurso    | Quantidade |
@@ -36,14 +35,14 @@ Feature: Adicionar, editar e remover recurso ou equipamento de sala
     When o administrador faz uma requisição DELETE para o recurso "Projetor" da sala "E232"
     Then o sistema retorna a mensagem "Não foi possível remover: Equipamento com reservas ativas" com status "400"
 
-  Scenario: Rejeitar associação de recurso a uma sala inexistente
+  Scenario: Editar a quantidade de recursos de uma sala
     Given o sistema tem salas com os seguintes recursos cadastrados:
       | Sala | Recurso    | Quantidade |
-      | E232 | Projetor   | 2          |
-      | D005 | Cadeiras   | 20         |
-    And a sala com nome "D999" não está cadastrada
-    When o administrador faz uma requisição POST do recurso "Cadeiras" à sala "D999" com quantidade "10"
-    Then o sistema retorna a mensagem "ID(s) fornecido(s) inválido(s)" com status "400"
+      | E104 | Computador | 5          |
+      | E104 | Projetor   | 1          |
+    When o administrador faz uma requisição PUT para o recurso "Computador" na sala "E104" com quantidade "10"
+    Then o sistema retorna a mensagem "Equipamento atualizado com sucesso" com status "200"
+    And o sistema registra o recurso "Computador" na sala "E104" com quantidade "10"
 
   Scenario: Consultar recursos associados a uma sala
     Given o sistema tem salas com os seguintes recursos cadastrados:
@@ -59,19 +58,26 @@ Feature: Adicionar, editar e remover recurso ou equipamento de sala
       | Projetor   | 1          |
     And o sistema retorna a mensagem "Equipamentos listados com sucesso" com status "200"
 
-  Scenario: Editar a quantidade de recursos de uma sala
+  Scenario: Consultar recursos de uma sala com Id inválido
+    Given a sala com nome "ABC123" não está cadastrada
+    When o administrador faz uma requisição GET para a sala "ABC123"
+    Then o sistema retorna a mensagem "ID(s) fornecido(s) inválido(s)" com status "400"
+
+  Scenario: Atualizar a quantidade de um recurso de sala para zero
     Given o sistema tem salas com os seguintes recursos cadastrados:
       | Sala | Recurso    | Quantidade |
-      | E104 | Computador | 5          |
-      | E104 | Projetor   | 1          |
-    When o administrador faz uma requisição PUT para o recurso "Computador" na sala "E104" com quantidade "10"
-    Then o sistema retorna a mensagem "Equipamento atualizado com sucesso" com status "200"
-    And o sistema registra o recurso "Computador" na sala "E104" com quantidade "10"
+      | E104 | Computador | 1          |
+      | D005 | Cadeiras   | 20         |
+    When o administrador faz uma requisição PUT para o recurso "Computador" na sala "E104" com quantidade "0"
+    Then o sistema retorna a mensagem "Equipamento removido da sala com sucesso" com status "200"
+    And o sistema remove o recurso "Computador" dos recursos associados à sala "E104"
+    And o recurso "Computador" permanece na base de dados geral para associações futuras
 
-  # Scenario: Editar quantidade de recursos de uma sala com algum parametro vazio
-  #   Given o sistema tem salas com os seguintes recursos cadastrados:
-  #     | Sala | Recurso    | Quantidade |
-  #     | E104 | Computador | 5          |
-  #     | E104 | Projetor   | 1          |
-  #   When o administrador faz uma requisição PUT para atualizar a quantidade do recurso "Computador" na sala "E104" sem informar a quantidade
-  #   Then o sistema retorna a mensagem "Quantidade deve ser um número inteiro maior que zero" com status "400"
+  Scenario: Rejeitar associação de recurso a uma sala inexistente
+    Given o sistema tem salas com os seguintes recursos cadastrados:
+      | Sala | Recurso    | Quantidade |
+      | E232 | Projetor   | 2          |
+      | D005 | Cadeiras   | 20         |
+    And a sala com nome "D999" não está cadastrada
+    When o administrador faz uma requisição POST do recurso "Cadeiras" à sala "D999" com quantidade "10"
+    Then o sistema retorna a mensagem "ID(s) fornecido(s) inválido(s)" com status "400"

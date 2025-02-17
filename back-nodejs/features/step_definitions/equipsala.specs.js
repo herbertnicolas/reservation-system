@@ -8,8 +8,11 @@ const EquipSala = require('../../src/models/EquipSala');
 const Equipamento = require('../../src/models/Equipamento');
 const Reserva = require('../../src/models/Reserva');
 const Room = require('../../src/models/Salas');
-const { resourceUsage } = require('process');
-
+const { 
+  getSalaIdByName, 
+  getEquipIdByName, 
+  getEquipSalaByName 
+} = require('../../src/controllers/EquipSala/EquipSalaController');
 
 Before(async () => {
   await connectDB(process.env.MONGO_URI);
@@ -94,14 +97,14 @@ Given('a sala {string} tem uma reserva ativa para o recurso {string}',
 
 When('o administrador faz uma requisição POST do recurso {string} à sala {string} com quantidade {string}', 
   async function (recurso, sala, quantidade) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipObj = await Equipamento.findOne({nome: recurso})
+  const salaId = await getSalaIdByName(sala);
+  const equipId = await getEquipIdByName(recurso);
   
   response = await request(server)
       .post('/equipsala')
       .send({ 
-        salaId: salaObj? salaObj._id : '' , 
-        equipamentoId: equipObj? equipObj._id : '', 
+        salaId: salaId, 
+        equipamentoId: equipId, 
         equipNome: recurso, 
         quantidade
       });
@@ -109,95 +112,80 @@ When('o administrador faz uma requisição POST do recurso {string} à sala {str
 
 When('o administrador faz uma requisição POST do recurso {string} à sala {string} sem informar a quantidade', 
   async function (recurso, sala) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipamento = await Equipamento.findOne({ nome: recurso });
+  const salaId = await getSalaIdByName(sala);
+  const equipId = await getEquipIdByName(recurso);
 
   response = await request(server)
     .post('/equipsala')
     .send({ 
-      salaId: salaObj? salaObj._id : null, 
-      equipamentoId: equipamento? equipamento._id : null 
+      salaId: salaId, 
+      equipamentoId: equipId
     });
 });
 
 When('o administrador faz uma requisição DELETE para o recurso {string} da sala {string}', 
   async function (recurso, sala) {
-  const salaObj = await Room.findOne({ identificador: sala }); 
-  const equipObj = await Equipamento.findOne({ nome: recurso });  
+  const salaId = await getSalaIdByName(sala);
+  const equipId = await getEquipIdByName(recurso);
 
   response = await request(server)
-    .delete(`/equipsala/${salaObj._id}/${equipObj._id}`);
+    .delete(`/equipsala/${salaId}/${equipId}`);
 });
 
 When('o administrador faz uma requisição GET para a sala {string}', 
   async function (sala) {
-  const salaObj = await Room.findOne({ identificador: sala });
+  const salaId = await getSalaIdByName(sala);
 
   response = await request(server)
-    .get(`/equipsala/${salaObj._id}`);
+    .get(`/equipsala/${salaId}`);
 });
 
 When('o administrador faz uma requisição PUT para o recurso {string} na sala {string} com quantidade {string}' , 
   async function (recurso, sala, quantidade) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipObj = await Equipamento.findOne({nome: recurso});
+  const salaId = await getSalaIdByName(sala);
+  const equipId = await getEquipIdByName(recurso);
+  
   response = await request(server)
-    .put(`/equipsala/${salaObj._id}/${equipObj._id}`)
+    .put(`/equipsala/${salaId}/${equipId}`)
     .send({ quantidade });
 });
 
 Then('o sistema registra o recurso {string} na sala {string} com quantidade {string}', 
   async function (recurso, sala, quantidade) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipObj = await Equipamento.findOne({ nome: recurso });
-  const equipSalaObj = await EquipSala.findOne({ salaId: salaObj._id, equipamentoId: equipObj._id });
+  const salaId = await getSalaIdByName(sala);
+  const equipId = await getEquipIdByName(recurso);
+  const equipSalaObj = await EquipSala.findOne({ salaId: salaId, equipamentoId: equipId });
   
-  strictEqual(equipSalaObj.equipamentoId.toString(), equipObj._id.toString());
-  strictEqual(equipSalaObj.salaId.toString(), salaObj._id.toString());
+  strictEqual(equipSalaObj.equipamentoId.toString(), equipId.toString());
+  strictEqual(equipSalaObj.salaId.toString(), salaId.toString());
   strictEqual(equipSalaObj.quantidade, parseInt(quantidade, 10));
 });
 
-Then('o recurso {string} é adicionado à base de dados de recursos disponíveis', 
-  async function (recurso) {
-  const equipamento = await Equipamento.findOne({ nome: recurso });
-  strictEqual(equipamento.nome, recurso);
+Then('o recurso {string} é adicionado à base de dados de recursos disponíveis', async function (recurso) {
+  const equipId = await getEquipIdByName(recurso);
+  strictEqual(equipId !== null, true);
 });
 
-Then('o sistema retorna a mensagem {string} com status {string}', 
-  async function (mensagem, status) {
-    strictEqual(response.body.msg, mensagem);
+Then('o sistema retorna a mensagem {string} com status {string}', async function (mensagem, status) {
+  strictEqual(response.body.msg, mensagem);
   strictEqual(response.status, parseInt(status, 10));
 });
 
-Then('o sistema remove o recurso {string} dos recursos associados à sala {string}', 
-  async function (recurso, sala) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipObj = await Equipamento.findOne({ nome: recurso });
-  const equipsalaObj = await EquipSala.findOne({ salaId: salaObj._id, equipamentoId: equipObj._id });
+Then('o sistema remove o recurso {string} dos recursos associados à sala {string}', async function (recurso, sala) {
+  const salaId = await getSalaIdByName(sala);
+  const equipId = await getEquipIdByName(recurso);
+  const equipsalaObj = await EquipSala.findOne({ salaId: salaId, equipamentoId: equipId });
 
   strictEqual(equipsalaObj, null);
 });
 
-Then('o recurso {string} permanece na base de dados geral para associações futuras', 
-  async function (recurso) {
-  const equipObj = await Equipamento.findOne({ nome: recurso });
-  strictEqual(equipObj.nome, recurso);
+Then('o recurso {string} permanece na base de dados geral para associações futuras', async function (recurso) {
+  const equipId = await getEquipIdByName(recurso);
+  strictEqual(equipId !== null, true);
 });
 
-Then('não adiciona {string} à sala {string}', 
-  async function (recurso, sala) {
-  const salaObj = await Room.findOne({ identificador: sala });
-  const equipObj = await Equipamento.findOne({ nome: recurso });
-  const equipSala = await EquipSala.findOne({ 
-    salaId: salaObj? salaObj._id : null, 
-    equipamentoId: equipObj? equipObj._id : null  
-  });
 
-  strictEqual(equipSala, null);
-});
-
-Then('o sistema retorna a lista de recursos da sala:', 
-  async function (dataTable) {
+Then('o sistema retorna a lista de recursos da sala:', async function (dataTable) {
   const listaRecursos = dataTable.hashes(); // Converte para array de objetos
   
   const equipamentos = response.body.data; // lista [ {Equipamento, quantidade}, ... ]

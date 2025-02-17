@@ -107,7 +107,7 @@ const getEquipamentosInSala = async (req, res) => { // -> aqui vai: filtrar, agr
     let bodyData = [], equipdata;
     
     for(i = 0; i < equipamentos.length; i++){
-      equipdata = await Equipamento.findById(equipamentos[i].equipamentoId.toString());
+      equipdata = await Equipamento.findById(equipamentos[i].equipamentoId);
       
       bodyData.push({
         equipamento: {
@@ -183,24 +183,17 @@ const updateEquipamentoInSala = async (req, res) => {
   }
 };
 
-
+// Metodos auxiliares
 const getSalaIdByName = async (sala) => {
   const salaObj = await Room.findOne({ identificador: sala });
-  return salaObj? salaObj._id : null
+  return salaObj? salaObj._id.toString() : null
 }
 
 const getEquipIdByName = async (equipamento) => {
   const equipObj = await Equipamento.findOne({ nome: equipamento });
-  return equipObj? equipObj._id : null
+  return equipObj? equipObj._id.toString() : null
 }
 
-const getEquipSalaByName = async (sala, equipamento) => {
-  const equipsalaObj = await EquipSala.findOne({
-    salaId: getSalaIdByName(sala),
-    equipamentoId: getEquipIdByName(equipamento)
-  })
-  return equipsalaObj? equipsalaObj : null
-}
 
 module.exports = {
   addEquipamentoToSala,
@@ -208,6 +201,5 @@ module.exports = {
   getEquipamentosInSala,
   updateEquipamentoInSala,
   getSalaIdByName,
-  getEquipIdByName,
-  getEquipSalaByName
+  getEquipIdByName
 };
