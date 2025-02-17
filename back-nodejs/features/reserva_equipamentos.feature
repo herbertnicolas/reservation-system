@@ -1,29 +1,85 @@
-Feature: Reserva de Equipamentos da Sala
-              Eu como um aluno
-  Quero reservar um equipamento da sala
-  Para que eu possa utilizá-lo na data agendada
+Feature: Gerenciamento de Reservas (solicitação) - Serviço
 
-        Scenario: Reserva bem-sucedida de um equipamento disponível
-            # vou precisar mudar para que seja a partir de uma sala especifica
-            Given que existe um equipamento com o nome "microscópio" cadastrado e disponível para reserva no dia "01/10/2025"
-             When eu seleciono o equipamento de nome "microscópio" e escolho a data "01/10/2025" para a reserva
-             Then o equipamento "microscópio" deve ter solicitação de reserva para o dia "01/10/2025"
-              And uma confirmação de solicitação de reserva deve ser exibida
+              Eu como Usuário
+     Quero solicitar, visualizar e gerenciar reservas de salas/equipamentos
+     Para garantir o uso adequado dos recursos disponíveis
 
-        Scenario: Tentativa de reservar um equipamento já reservado
-            Given que existe um equipamento com o nome "microscópio" cadastrado e já reservado para o dia "01/10/2025"
-             When eu tento reservar o equipamento "microscópio" para a data "01/10/2025"
-             Then a solicitação de reserva não deve ser concluída
-              And uma mensagem de "Reserva indisponível para esta data" deve ser exibida
-              
-        Scenario: Tentativa de reservar um equipamento para uma data inválida
-            Given que existe um equipamento com o nome "microscópio" cadastrado e disponível para reserva
-             When eu tento reservar o equipamento "microscópio" para a data "01/01/2020"
-             Then a solicitação de reserva não deve ser concluída
-              And uma mensagem de "Selecione uma data válida" deve ser exibida
+        Background:
+            Given as seguintes salas cadastradas:
+                  | tipo | identificador | localização | capacidade |
+                  | sala | D005          | Prédio D    | 50         |
 
-        Scenario: Tentativa de reserva sem selecionar uma data
-            Given que existe um equipamento com o nome "microscópio" cadastrado e disponível para reserva no dia "01/10/2025"
-             When eu tento reservar o equipamento "microscópio" sem escolher uma data
-             Then a solicitação de reserva não deve ser concluída
-              And uma mensagem de "Selecione uma data válida" deve ser exibida
+              And os seguintes equipamentos cadastrados:
+                  | nome        |
+                  | Microscópio |
+
+
+              And as seguintes reservas existem:
+                  | tipo        | dataReserva | identificador | equipamentoId            |
+                  | sala        | 20/05/2024  | D005          | 67b28c7a988ebb5f9240df2f |
+                  | equipamento | 20/05/2024  | D005          | 67b28c7a988ebb5f9240df2f |
+
+        Scenario: Buscar reserva inexistente
+             When envio uma request "GET" para o endpoint "/reservas/67b29e02df2d2d1fac2fa9a4"
+             Then recebo a response com status "404 Not Found"
+              And o corpo da resposta possui:
+                  """
+                  {
+                       "msg": "Reserva não encontrado"
+                  }
+                  """
+
+     # ------------------- CRIAR RESERVA -------------------
+        Scenario: Criar reserva de sala com sucesso
+             When envio uma request "POST" para o endpoint "/reservas" com os atributos tipo "sala", dataReserva "25/05/2024" salaId e equipamentoId existentes no banco
+             Then recebo a response com status "201 Created"
+             Then o corpo da resposta contém a mensagem "Reserva de sala criada com sucesso"
+
+        Scenario: Criar reserva de equipamento com sucesso
+             When envio uma request "POST" para o endpoint "/reservas" com os atributos tipo "equipamento", dataReserva "25/05/2024" salaId e equipamentoId existentes no banco
+             Then recebo a response com status "201 Created"
+              And o corpo da resposta contém a mensagem "Reserva de equipamento criada com sucesso"
+
+        Scenario: Falha ao criar reserva sem dados obrigatórios
+             When envio uma request "POST" para o endpoint "/reservas" com o corpo:
+                  """
+                  {
+                       "dataReserva": "25/05/2024"
+                  }
+                  """
+             Then recebo a response com status "400 Bad Request"
+              And o corpo da resposta contém a mensagem "Selecione uma data válida"
+
+     # ------------------- ATUALIZAR RESERVA -------------------
+        Scenario: Atualizar data da reserva com sucesso
+            Dado uma reserva existente para "25/05/2024"
+             When envio uma request "PUT" para o endpoint "/reservas/{reservaId}" com o corpo:
+                  """
+                  {
+                       "dataReserva": "28/02/2024"
+                  }
+                  """
+             Then recebo a response com status "200 OK"
+              And o corpo da resposta contém a mensagem "Reserva atualizada com sucesso"
+
+        Scenario: Tentar atualizar equipamento para data reservada
+             When envio uma request "PUT" para o endpoint "/reservas/{reservaId}" com o corpo:
+                  """
+                  {
+                       "dataReserva": "20/05/2024"
+                  }
+                  """
+             Then recebo a response com status "500 Internal Server Error"
+              And o corpo da resposta contém a mensagem "já está reservada"
+
+     # ------------------- REMOVER RESERVA -------------------
+
+        Scenario: Tentar remover reserva inexistente
+             When envio uma request "DELETE" para o endpoint "/reservas/507f1f77bcf86cd799439011"
+             Then recebo a response com status "404 Not Found"
+              And o corpo da resposta possui:
+                  """
+                  {
+                       "msg": "Reserva não encontrada"
+                  }
+                  """
