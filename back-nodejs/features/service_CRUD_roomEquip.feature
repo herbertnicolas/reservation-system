@@ -5,6 +5,7 @@ Feature: Adicionar, editar e remover recurso ou equipamento de sala
 
   Scenario: Adicionar recurso não cadastrado no sistema
     Given a sala com nome "E112" está cadastrada
+    And o recurso com nome "Microfone" não está cadastrado
     When o administrador faz uma requisição POST do recurso "Microfone" à sala "E112" com quantidade "10"
     Then o sistema registra o recurso "Microfone" na sala "E112" com quantidade "10"
     And o recurso "Microfone" é adicionado à base de dados de recursos disponíveis
@@ -40,6 +41,7 @@ Feature: Adicionar, editar e remover recurso ou equipamento de sala
       | Sala | Recurso    | Quantidade |
       | E232 | Projetor   | 2          |
       | D005 | Cadeiras   | 20         |
+    And a sala com nome "D999" não está cadastrada
     When o administrador faz uma requisição POST do recurso "Cadeiras" à sala "D999" com quantidade "10"
     Then o sistema retorna a mensagem "ID(s) fornecido(s) inválido(s)" com status "400"
 
@@ -57,14 +59,14 @@ Feature: Adicionar, editar e remover recurso ou equipamento de sala
       | Projetor   | 1          |
     And o sistema retorna a mensagem "Equipamentos listados com sucesso" com status "200"
 
-  # Scenario: Editar a quantidade de recursos de uma sala
-  #   Given o sistema tem salas com os seguintes recursos cadastrados:
-  #     | Sala | Recurso    | Quantidade |
-  #     | E104 | Computador | 5          |
-  #     | E104 | Projetor   | 1          |
-  #   When o administrador faz uma requisição PUT para atualizar a quantidade do recurso "Computador" na sala "E104" para "10"
-  #   Then o sistema retorna a mensagem "Equipamento atualizado com sucesso" com status "200"
-  #   And o sistema registra o recurso "Computador" com quantidade "10" na sala "E104"
+  Scenario: Editar a quantidade de recursos de uma sala
+    Given o sistema tem salas com os seguintes recursos cadastrados:
+      | Sala | Recurso    | Quantidade |
+      | E104 | Computador | 5          |
+      | E104 | Projetor   | 1          |
+    When o administrador faz uma requisição PUT para o recurso "Computador" na sala "E104" com quantidade "10"
+    Then o sistema retorna a mensagem "Equipamento atualizado com sucesso" com status "200"
+    And o sistema registra o recurso "Computador" na sala "E104" com quantidade "10"
 
   # Scenario: Editar quantidade de recursos de uma sala com algum parametro vazio
   #   Given o sistema tem salas com os seguintes recursos cadastrados:

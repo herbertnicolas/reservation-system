@@ -1,7 +1,9 @@
 const EquipSala = require('../../models/EquipSala');
 const Equipamento = require('../../models/Equipamento');
 const Reserva = require('../../models/Reserva');
+const Room = require('../../models/Salas')
 const mongoose = require('mongoose');
+
 
 const addEquipamentoToSala = async (req, res) => {
   try {
@@ -181,9 +183,31 @@ const updateEquipamentoInSala = async (req, res) => {
   }
 };
 
+
+const getSalaIdByName = async (sala) => {
+  const salaObj = await Room.findOne({ identificador: sala });
+  return salaObj? salaObj._id : null
+}
+
+const getEquipIdByName = async (equipamento) => {
+  const equipObj = await Equipamento.findOne({ nome: equipamento });
+  return equipObj? equipObj._id : null
+}
+
+const getEquipSalaByName = async (sala, equipamento) => {
+  const equipsalaObj = await EquipSala.findOne({
+    salaId: getSalaIdByName(sala),
+    equipamentoId: getEquipIdByName(equipamento)
+  })
+  return equipsalaObj? equipsalaObj : null
+}
+
 module.exports = {
   addEquipamentoToSala,
   removeEquipamentoFromSala,
   getEquipamentosInSala,
-  updateEquipamentoInSala
+  updateEquipamentoInSala,
+  getSalaIdByName,
+  getEquipIdByName,
+  getEquipSalaByName
 };
