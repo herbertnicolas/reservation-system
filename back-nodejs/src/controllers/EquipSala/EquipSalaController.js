@@ -1,6 +1,6 @@
 const EquipSala = require('../../models/EquipSala');
 const Equipamento = require('../../models/Equipamento');
-const Room = require('../../models/Salas');
+const Reserva = require('../../models/Reserva');
 const mongoose = require('mongoose');
 
 const addEquipamentoToSala = async (req, res) => {
@@ -57,14 +57,17 @@ const removeEquipamentoFromSala = async (req, res) => {
       return res.status(400).json({ msg: 'ID(s) fornecido(s) inválido(s)' });
     }
     
+    
     // verifica se existe o equipamento na sala; indiretamente tambem verifica se o equipamento existe
     const equipSala = await EquipSala.findOne({ salaId, equipamentoId });
     if (!equipSala) {
       return res.status(404).json({ msg: 'Equipamento não encontrado para a sala informada' });
     }
-
+    
     // verifica se há reservas ativas para esse equipamento nessa sala
-    if (equipSala.datasReservas.length > 0) {
+    const reservas = await Reserva.find({tipo: 'equipamento', equipSalaId: equipamentoId, salaId: salaId}) 
+
+    if (reservas.length > 0) {
       return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
     }
     
