@@ -1,7 +1,9 @@
 const EquipSala = require('../../models/EquipSala');
 const Equipamento = require('../../models/Equipamento');
-const Room = require('../../models/Salas');
+const Reserva = require('../../models/Reserva');
+const Room = require('../../models/Salas')
 const mongoose = require('mongoose');
+
 
 const addEquipamentoToSala = async (req, res) => {
   try {
@@ -57,14 +59,17 @@ const removeEquipamentoFromSala = async (req, res) => {
       return res.status(400).json({ msg: 'ID(s) fornecido(s) inválido(s)' });
     }
     
+    
     // verifica se existe o equipamento na sala; indiretamente tambem verifica se o equipamento existe
     const equipSala = await EquipSala.findOne({ salaId, equipamentoId });
     if (!equipSala) {
       return res.status(404).json({ msg: 'Equipamento não encontrado para a sala informada' });
     }
-
+    
     // verifica se há reservas ativas para esse equipamento nessa sala
-    if (equipSala.datasReservas.length > 0) {
+    const reservas = await Reserva.find({tipo: 'equipamento', equipSalaId: equipamentoId, salaId: salaId}) 
+
+    if (reservas.length > 0) {
       return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
     }
     
@@ -178,9 +183,31 @@ const updateEquipamentoInSala = async (req, res) => {
   }
 };
 
+
+const getSalaIdByName = async (sala) => {
+  const salaObj = await Room.findOne({ identificador: sala });
+  return salaObj? salaObj._id : null
+}
+
+const getEquipIdByName = async (equipamento) => {
+  const equipObj = await Equipamento.findOne({ nome: equipamento });
+  return equipObj? equipObj._id : null
+}
+
+const getEquipSalaByName = async (sala, equipamento) => {
+  const equipsalaObj = await EquipSala.findOne({
+    salaId: getSalaIdByName(sala),
+    equipamentoId: getEquipIdByName(equipamento)
+  })
+  return equipsalaObj? equipsalaObj : null
+}
+
 module.exports = {
   addEquipamentoToSala,
   removeEquipamentoFromSala,
   getEquipamentosInSala,
-  updateEquipamentoInSala
+  updateEquipamentoInSala,
+  getSalaIdByName,
+  getEquipIdByName,
+  getEquipSalaByName
 };
