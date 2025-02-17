@@ -1,6 +1,10 @@
 const { Given, When, Then } = require('@cucumber/cucumber');
 const request = require('supertest');
-const { expect } = require('chai');
+// const { expect } = require('chai');
+let chai;
+(async () => {
+  chai = await import('chai');
+})();
 const app = require('../../src/server').app;
 const Reserva = require('../../src/models/Reserva');
 const mongoose = require('mongoose');
