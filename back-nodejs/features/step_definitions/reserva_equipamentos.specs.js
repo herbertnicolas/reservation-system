@@ -1,159 +1,131 @@
-const mongoose = require("mongoose");
-const { Given, When, Then, Before, After } = require("cucumber");
-const request = require("supertest");
-const { app } = require("../../src/server");
-const { connectDB, disconnectDB } = require("../../src/database");
-const EquipSala = require("../../src/models/EquipSala");
-const Equipamento = require("../../src/models/Equipamento");
-const Sala = require("../../src/models/Salas");
+const { Given, When, Then, Before } = require('cucumber');
+const assert = require('assert');
+const request = require('supertest');
+const app = require('../../src/server').app;
+const Reserva = require('../../src/models/Reserva');
+const Sala = require('../../src/models/Salas');
+const EquipSala = require('../../src/models/EquipSala');
+const Equipamento = require('../../src/models/Equipamento');
 
-let equipSalaId;
 let response;
-let server;
+let targetReserva;
+let tempSalaId;
+let equipamentosCadastrados = [];
+// ------------------- PASSOS COMUNS -------------------
+Given('as seguintes salas cadastradas:', async function (dataTable) {
+  for (const item of dataTable.hashes()) {
+      const novaSala = await new Sala({
+        identificador: item.identificador,
+        localizacao: item.localização,
+        capacidade: parseInt(item.capacidade)
+      }).save();
 
-// Hooks para gerenciar a conexão do banco
-Before(async () => {
-  await connectDB(process.env.MONGODB_URI);
-  server = app.listen(4001); // Porta diferente do ambiente normal
-
-  await mongoose.connection.db.dropCollection("equipamentos");
-});
-
-After(async () => {
-  await server.close();
-  await disconnectDB();
-});
-Given(
-  "que existe um equipamento com o nome {string} cadastrado e disponível para reserva no dia {string}",
-  async function (equipamentoNome, data) {
-    const equipamento = new Equipamento({ nome: equipamentoNome });
-    await equipamento.save();
-
-    const sala = new Sala({
-      identificador: "Sala1",
-      predio: "Prédio A",
-      capacidade: 10,
-    });
-    await sala.save();
-
-    const equipSala = new EquipSala({
-      salaId: sala._id,
-      equipamentoId: equipamento._id,
-      quantidade: 1,
-      datasReservas: [],
-    });
-    await equipSala.save();
-
-    equipSalaId = equipSala._id;
-  }
-);
-
-When(
-  "eu seleciono o equipamento de nome {string} e escolho a data {string} para a reserva",
-  async function (equipamentoNome, data) {
-    response = await request(server).post("/reservas").send({
-      tipo: "equipamento",
-      equipSalaId: equipSalaId,
-      dataReserva: data,
-    });
-  }
-);
-
-Then(
-  "o equipamento {string} deve ter solicitação de reserva para o dia {string}",
-  async function (equipamentoNome, data) {
-    const equipSala = await EquipSala.findById(equipSalaId);
-    if (!equipSala.datasReservas.includes(data)) {
-      throw new Error(`Data ${data} não encontrada nas reservas`);
-    }
-  }
-);
-
-Then("uma confirmação de solicitação de reserva deve ser exibida", function () {
-  if (response.status !== 201 || !response.body.msg.includes("sucesso")) {
-    throw new Error("Confirmação não exibida");
+      tempSalaId = novaSala._id;
   }
 });
 
-Given(
-  "que existe um equipamento com o nome {string} cadastrado e já reservado para o dia {string}",
-  async function (equipamentoNome, data) {
-    const equipamento = new Equipamento({ nome: equipamentoNome });
-    await equipamento.save();
+Given('os seguintes equipamentos cadastrados:', async function (dataTable) {
+  for (const item of dataTable.hashes()) {
+    const equip = await new Equipamento({ nome: item.nome }).save();
+    equipamentosCadastrados.push(equip);
 
-    const sala = new Sala({
-      identificador: "Sala1",
-      predio: "Prédio A",
-      capacidade: 10,
-    });
-    await sala.save();
-
-    const equipSala = new EquipSala({
-      salaId: sala._id,
-      equipamentoId: equipamento._id,
-      quantidade: 1,
-      datasReservas: [data],
-    });
-    await equipSala.save();
-
-    equipSalaId = equipSala._id;
-  }
-);
-
-When(
-  "eu tento reservar o equipamento {string} para a data {string}",
-  async function (equipamentoNome, data) {
-    response = await request(server).post("/reservas").send({
-      tipo: "equipamento",
-      equipSalaId: equipSalaId,
-      dataReserva: data,
-    });
-  }
-);
-
-Then("a solicitação de reserva não deve ser concluída", function () {
-  if (response.status < 400 || response.status >= 500) {
-    throw new Error(`Resposta inesperada: ${response.status}`);
+    const novoEquipamento = new EquipSala({
+      salaId: tempSalaId,
+      equipamentoId: equip._id,
+      quantidade: 5,
+      datasReservas: []
+    })
+    await novoEquipamento.save();
   }
 });
 
-Then("uma mensagem de {string} deve ser exibida", function (mensagem) {
-  if (!response.body.msg.includes(mensagem)) {
-    throw new Error(`Mensagem "${mensagem}" não encontrada`);
+Given('as seguintes reservas existem:', async function (dataTable) {
+  for (const reserva of dataTable.hashes()) {
+    const novaReserva = new Reserva({
+      salaId: tempSalaId,
+      equipamentoId: equipamentosCadastrados[0]._id,
+      dataReserva: reserva.dataReserva,
+      tipo: reserva.tipo,
+    });
+    await novaReserva.save();
   }
 });
 
-Given(
-  "que existe um equipamento com o nome {string} cadastrado e disponível para reserva",
-  async function (equipamentoNome) {
-    const equipamento = new Equipamento({ nome: equipamentoNome });
-    await equipamento.save();
+Given('uma reserva existente para {string}', async function (data) {
+  targetReserva = await Reserva.findOne({ dataReserva: data });
+});
 
-    const sala = new Sala({
-      identificador: "Sala1",
-      predio: "Prédio A",
-      capacidade: 10,
+// ------------------- PASSOS DE AÇÃO -------------------
+When('envio uma request {string} para o endpoint {string}', async function (method, endpoint) {
+  const url = endpoint.replace('{reservaId}', targetReserva?._id || 'invalid_id');
+  response = await request(app)[method.toLowerCase()](url);
+});
+
+When ('envio uma request {string} para o endpoint de uma reserva {string}',
+  async function (method, endpoint) {
+    const novaReserva = new Reserva({
+      salaId: tempSalaId,
+      // equipamentoId: equipamentosCadastrados[0]._id,
+      dataReserva: "2025-03-08",
+      tipo: "sala",
     });
-    await sala.save();
+    await novaReserva.save();
+    const url = endpoint.replace('{reservaId}', novaReserva._id.toString() || 'invalid_id');
+    console.log("&&&&&&&&&&&&&&&&", url);
 
-    const equipSala = new EquipSala({
-      salaId: sala._id,
-      equipamentoId: equipamento._id,
-      quantidade: 1,
-      datasReservas: [],
-    });
-    await equipSala.save();
-
-    equipSalaId = equipSala._id;
+    response = await request(app)[method.toLowerCase()](url);
   }
 );
 
-When(
-  "eu tento reservar o equipamento {string} sem escolher uma data",
-  async function (equipamentoNome) {
-    response = await request(server).post("/reservas").send({
-      tipo: "equipamento",
-      equipSalaId: equipSalaId,
+
+// When('envio uma request {string} para o endpoint {string} com o corpo:', async function (method, endpoint, docString) {
+//   response = await request(app)[method.toLowerCase()](endpoint).send({
+//     tipo,
+//     dataReserva,
+//     salaId: tempSalaId,
+//     equipamentoId: equipamentosCadastrados[0]._id
+//   });
+// });
+
+// ------------------- VERIFICAÇÕES -------------------
+Then('recebo a response com status {string}', function (status) {
+  assert.strictEqual(response.status, parseInt(status));
+});
+
+Then('o corpo da resposta contém uma lista com {int} reservas', function (quantidade) {
+  assert.strictEqual(response.body.data.length, quantidade);
+});
+
+Then('cada reserva possui os campos {string}', function (campos) {
+  const camposArray = campos.replace(/"/g, '').split(', ');
+  response.body.data.forEach(reserva => {
+    camposArray.forEach(campo => {
+      assert.ok(reserva.hasOwnProperty(campo), `Campo ${campo} não encontrado`);
     });
-  }
-);
+  });
+});
+
+Then('o corpo da resposta contém a mensagem {string}', function (mensagem) {
+  assert.ok(response.body.msg.includes(mensagem));
+});
+
+Then('o corpo da resposta possui:', function (docString) {
+  const expected = JSON.parse(docString);
+  assert.deepStrictEqual(response.body, expected);
+});
+
+When('envio uma request {string} para o endpoint {string} com os atributos tipo {string}, dataReserva {string} salaId e equipamentoId existentes no banco',
+  async function (method, endpoint, tipo, dataReserva) {
+    console.log("&&&&&&&&&&&&&&&&", endpoint);
+    response = await request(app)[method.toLowerCase()](endpoint).send({
+      tipo,
+      dataReserva,
+      salaId: tempSalaId.toString(),
+    });    
+});
+
+When('envio uma request {string} para o endpoint {string} com o corpo:', async function (method, endpoint, docString) {
+  const corpo = JSON.parse(docString);
+  response = await request(app)[method.toLowerCase()](endpoint).send(corpo);
+});
+

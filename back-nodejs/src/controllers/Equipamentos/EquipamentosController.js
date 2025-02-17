@@ -37,13 +37,34 @@ const getEquipamento = async (req, res) => {
   }
 };
 
+const getEquipamentoByName = async (req, res) => {
+  try {
+    const equipamento = await Equipamento.findOne({ nome: req.params.equipamentoNome });
+
+    if (!equipamento) {
+      return res.status(404).json({
+        msg: 'Equipamento não encontrado',
+      });
+    }
+
+    return res.status(200).json({
+      msg: 'Equipamento encontrado com sucesso',
+      data: equipamento,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      msg: 'Erro ao buscar equipamento',
+      error: err.message,
+    });
+  }
+}
+
 const criarEquipamento = async (req, res) => {
   try {
-    const { _id, nome, disponibilidade } = req.body;
+    const {nome} = req.body;
 
     const equipamento = new Equipamento({
       nome,
-      disponibilidade,
     });
 
     await equipamento.save();
@@ -64,4 +85,5 @@ module.exports = {
   getEquipamentos,
   getEquipamento,
   criarEquipamento,
+  getEquipamentoByName
 };
