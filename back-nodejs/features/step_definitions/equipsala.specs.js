@@ -11,7 +11,6 @@ const Room = require('../../src/models/Salas');
 const { 
   getSalaIdByName, 
   getEquipIdByName, 
-  getEquipSalaByName 
 } = require('../../src/controllers/EquipSala/EquipSalaController');
 
 Before(async () => {
