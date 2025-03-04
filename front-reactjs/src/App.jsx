@@ -54,8 +54,8 @@ const Home = () => {
               <td>{room.localizacao}</td>
               <td>{room.capacidade}</td>
               <td>
-                <button onClick={() => navigate(`/editar-sala/${room._id}`)}>Editar</button>
-                <button onClick={() => handleDelete(room._id)}>Remover</button>
+                <button onClick={() => navigate(`/editar-sala/${room._id}`)}>Editar Sala</button>
+                <button onClick={() => handleDelete(room._id)}>Remover Sala</button>
               </td>
             </tr>
           ))}
