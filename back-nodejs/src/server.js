@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 //arquivos de rotas
 const roomRoutes = require('./routes/salas.routes.js');
 const equipamentosRoutes = require('./routes/equipamentos.routes.js');
@@ -9,6 +10,7 @@ const verificarReservasRoutes = require('./routes/verificarreservas.routes.js');
 const { connectDB } = require('./database/index');
 const app = express();
 
+app.use(cors());
 // iniciando o banco de dados
 (async () => {
   try {
