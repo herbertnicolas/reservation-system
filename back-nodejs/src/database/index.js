@@ -6,6 +6,7 @@ const connectDB = async (uri) => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    await mongoose.connection.asPromise();
     console.log('Conectado ao banco de dados!!! 🚀');
   } catch (err) {
     console.error('Erro ao conectar ao banco de dados', err);
