@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+//arquivos de rotas
 const roomRoutes = require('./routes/salas.routes.js');
 const equipamentosRoutes = require('./routes/equipamentos.routes.js');
 const equipSalaRoutes = require('./routes/equipsala.routes.js');
@@ -9,14 +10,8 @@ const { connectDB } = require('./database/index');
 
 const app = express();
 
-// ✅ Configuração do CORS deve vir antes de qualquer rota
-app.use(cors({
-  origin: 'http://localhost:5173', // Altere para a URL correta do frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type'],
-}));
-
-// Iniciando o banco de dados
+app.use(cors());
+// iniciando o banco de dados
 (async () => {
   try {
     await connectDB(process.env.MONGO_URI);
