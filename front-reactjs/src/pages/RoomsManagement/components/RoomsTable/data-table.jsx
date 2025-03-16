@@ -82,7 +82,7 @@ export function DataTable({ columns, data }) {
       >
         <Grid item className="w-1/3">
           <Input
-            placeholder="Pesquisar usuário..."
+            placeholder="Pesquisar salas..."
             value={filterValue}
             onChange={handleFilterChange}
             className="max-w-sm bg-white"
@@ -96,9 +96,9 @@ export function DataTable({ columns, data }) {
             htmlType="submit"
             block
             size="large"
-            onClick={() => navigate("/cadastro-usuario")}
+            onClick={() => navigate("/sala-cadastro")}
           >
-            Novo usuário
+            Nova sala
           </Button>
         </Grid>
       </Grid>
