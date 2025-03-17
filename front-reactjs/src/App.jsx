@@ -1,24 +1,24 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-import "./output.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Home from "./pages/Home/Home";
+import RoomsManagement from "./pages/RoomsManagement/RoomsManagement";
+import CreateRoom from "./pages/RoomsManagement/CreateRoom/CreateRoom";
+import EditRoom from "./pages/RoomsManagement/EditRoom/EditRoom";
+import "./index.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
-import Home from "./pages/Home/Home";
-import "./index.css";
-import RoomsManagement from "./pages/RoomsManagement/RoomsManagement";
+import "./output.css";
 
 const App = () => {
   return (
     <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-        </Routes>
-        {/* Salas */}
-        <Routes>
-          <Route path="/gestao-salas" element={<RoomsManagement />} />
-        </Routes>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/gestao-salas" element={<RoomsManagement />} />
+        <Route path="/sala-cadastro" element={<CreateRoom />} />
+        <Route path="/editar-sala/:id" element={<EditRoom />} />
+      </Routes>
       <ToastContainer />
     </Router>
   );

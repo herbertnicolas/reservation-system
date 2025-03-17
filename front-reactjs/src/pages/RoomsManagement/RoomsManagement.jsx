@@ -26,7 +26,10 @@ export default function RoomsManagement({ children }) {
   };
 
   const confirmDelete = async () => {
-    await api.delete(`/salas/${selectedRoomId}`);
+    await fetch(`http://localhost:3001/salas/${selectedRoomId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
     setIsModalOpen(false);
     // Atualize a lista de usuários aqui
     toast.success("Sala excluída com sucesso!");
@@ -59,7 +62,7 @@ export default function RoomsManagement({ children }) {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            NOME DO ÓRGÃO
+            IDENTIFICADOR
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -73,7 +76,7 @@ export default function RoomsManagement({ children }) {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            SIGLA
+            LOCALIZACAO
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -87,7 +90,7 @@ export default function RoomsManagement({ children }) {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            ATIVO
+            CAPACIDADE
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
