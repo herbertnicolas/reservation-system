@@ -74,35 +74,48 @@ const createRoom = async (req, res) => {
 };
 
 const updateRoom = async (req, res) => {
-    const { id } = req.params;
-    const { capacidade } = req.body;
-    if (typeof capacidade !== 'number') {
-      return res.status(400).json({
-        erro: "Capacidade deve ser um número!",
+  const { id } = req.params;
+  const { identificador, localizacao, capacidade } = req.body; // Pegue todos os campos
+
+  if (typeof identificador !== 'string') {
+    return res.status(400).json({
+      erro: "Identificador deve ser uma string!",
+    });
+  }
+
+  if (typeof capacidade !== 'number') {
+    return res.status(400).json({
+      erro: "Capacidade deve ser um número!",
+    });
+  }
+
+  try {
+    const room = await Room.findById(id);
+    if (!room) {
+      return res.status(404).json({
+        erro: `Sala com identificador ${id} não existe!`,
       });
     }
-    try {
-      const room = await Room.findById(id);
-      if (!room) {
-        return res.status(404).json({
-          erro: `Sala com identificador ${id} não existe!`,
-        });
-      }
-      room.capacidade = capacidade;
-      await room.save();
-      res.status(200).json({
-        mensagem: "Sala editada com sucesso!",
-        sala: {
-          identificador: room.identificador,
-          localizacao: room.localizacao,
-          capacidade: room.capacidade,
-        },
-      });
-    } catch (error) {
-      res.status(500).json({
-        erro: "Erro ao editar sala",
-      });
-    }
+
+    room.identificador = identificador;
+    room.localizacao = localizacao;
+    room.capacidade = capacidade;
+
+    await room.save();
+
+    res.status(200).json({
+      mensagem: "Sala editada com sucesso!",
+      sala: {
+        identificador: room.identificador,
+        localizacao: room.localizacao,
+        capacidade: room.capacidade,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      erro: "Erro ao editar sala",
+    });
+  }
 };
 const deleteRoom = async (req, resp) => {
     try {

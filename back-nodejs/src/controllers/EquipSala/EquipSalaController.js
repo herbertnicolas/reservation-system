@@ -1,8 +1,8 @@
+const mongoose = require('mongoose');
 const EquipSala = require('../../models/EquipSala');
 const Equipamento = require('../../models/Equipamento');
 const Reserva = require('../../models/Reserva');
 const Room = require('../../models/Salas')
-const mongoose = require('mongoose');
 
 
 const addEquipamentoToSala = async (req, res) => {
