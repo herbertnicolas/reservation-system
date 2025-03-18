@@ -81,3 +81,19 @@ Feature: Adicionar, editar e remover recurso ou equipamento de sala
     Given a sala com nome "ABC123" não está cadastrada
     When o administrador faz uma requisição GET para a sala "ABC123"
     Then o sistema retorna a mensagem "ID(s) fornecido(s) inválido(s)" com status "400"
+
+  Scenario: Consultar todos os equipamentos de todas as salas
+    Given o sistema tem salas com os seguintes recursos cadastrados:
+      | Sala | Recurso    | Quantidade |
+      | E232 | Projetor   | 2          |
+      | D005 | Cadeiras   | 20         |
+      | E104 | Computador | 5          |
+      | E104 | Projetor   | 1          |
+    When o administrador faz uma requisição GET para listar todos os equipamentos
+    Then o sistema retorna a mensagem "Equipamentos listados com sucesso" com status "200"
+    And o sistema retorna a lista completa de recursos:
+      | Sala | Recurso    | Quantidade |
+      | E232 | Projetor   | 2          |
+      | D005 | Cadeiras   | 20         |
+      | E104 | Computador | 5          |
+      | E104 | Projetor   | 1          |

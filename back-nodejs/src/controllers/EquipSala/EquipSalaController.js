@@ -88,51 +88,6 @@ const removeEquipamentoFromSala = async (req, res) => {
   }
 };
 
-const getEquipamentosInSala = async (req, res) => { // -> aqui vai: filtrar, agrupar e ordenar (listas)
-  try {
-    const { salaId } = req.params;
-
-    // salaId deve ser ObjectId válido
-    if (!mongoose.isValidObjectId(salaId)) {
-      return res.status(400).json({ msg: 'ID(s) fornecido(s) inválido(s)' });
-    }
-    
-    const equipamentos = await EquipSala.find({ salaId: salaId });
-    // sala não existe ou não tem equipamentos
-   
-    if (equipamentos.length == 0) {
-      return res.status(404).json({ msg: 'Nenhum equipamento encontrado para a sala informada' });
-    }
-    
-    let bodyData = [], equipdata;
-    
-    for(i = 0; i < equipamentos.length; i++){
-      equipdata = await Equipamento.findById(equipamentos[i].equipamentoId);
-      
-      bodyData.push({
-        equipamento: {
-          _id: equipdata._id,
-          nome: equipdata.nome,
-          datasReservas: equipdata.datasReservas
-        },
-        quantidade: equipamentos[i].quantidade
-      });
-      
-    }
-    
-    return res.status(200).json({ 
-      msg: 'Equipamentos listados com sucesso', 
-      data: bodyData
-    });
-
-  } catch (error) {
-    return res.status(500).json({ 
-      msg: 'Erro interno no servidor', 
-      error: error.message
-    });
-  }
-};
-
 const updateEquipamentoInSala = async (req, res) => {
   try {
     const { salaId, equipamentoId } = req.params;
@@ -183,6 +138,91 @@ const updateEquipamentoInSala = async (req, res) => {
   }
 };
 
+const getEquipamentosInSala = async (req, res) => { // -> aqui vai: filtrar, agrupar e ordenar (listas)
+  try {
+    const { salaId } = req.params;
+
+    // salaId deve ser ObjectId válido
+    if (!mongoose.isValidObjectId(salaId)) {
+      return res.status(400).json({ msg: 'ID(s) fornecido(s) inválido(s)' });
+    }
+    
+    const equipamentos = await EquipSala.find({ salaId: salaId });
+    // sala não existe ou não tem equipamentos
+   
+    if (equipamentos.length == 0) {
+      return res.status(404).json({ msg: 'Nenhum equipamento encontrado para a sala informada' });
+    }
+    
+    let bodyData = [], equipdata;
+    
+    for(i = 0; i < equipamentos.length; i++){
+      equipdata = await Equipamento.findById(equipamentos[i].equipamentoId);
+      
+      bodyData.push({
+        equipamento: {
+          _id: equipdata._id,
+          nome: equipdata.nome,
+          datasReservas: equipdata.datasReservas
+        },
+        quantidade: equipamentos[i].quantidade
+      });
+      
+    }
+    
+    return res.status(200).json({ 
+      msg: 'Equipamentos listados com sucesso', 
+      data: bodyData
+    });
+
+  } catch (error) {
+    return res.status(500).json({ 
+      msg: 'Erro interno no servidor', 
+      error: error.message
+    });
+  }
+};
+
+const getAllEquipSala = async (req, res) => {
+  try {
+    const equipamentos = await EquipSala.find()
+      .populate('salaId')
+      .populate('equipamentoId');
+
+    if (equipamentos.length === 0) {
+      return res.status(404).json({ 
+        msg: 'Nenhum equipamento encontrado em nenhuma sala' 
+      });
+    }
+
+    let bodyData = [];
+    for (let equipSala of equipamentos) {
+      bodyData.push({
+        equipamento: {
+          _id: equipSala.equipamentoId._id,
+          nome: equipSala.equipamentoId.nome
+        },
+        sala: {
+          _id: equipSala.salaId._id,
+          identificador: equipSala.salaId.identificador
+        },
+        quantidade: equipSala.quantidade
+      });
+    }
+
+    return res.status(200).json({
+      msg: 'Equipamentos listados com sucesso',
+      data: bodyData
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      msg: 'Erro interno no servidor',
+      error: error.message
+    });
+  }
+};
+
 // Metodos auxiliares
 const getSalaIdByName = async (sala) => {
   const salaObj = await Room.findOne({ identificador: sala });
@@ -198,8 +238,9 @@ const getEquipIdByName = async (equipamento) => {
 module.exports = {
   addEquipamentoToSala,
   removeEquipamentoFromSala,
-  getEquipamentosInSala,
   updateEquipamentoInSala,
+  getEquipamentosInSala,
+  getAllEquipSala,
   getSalaIdByName,
   getEquipIdByName
 };
