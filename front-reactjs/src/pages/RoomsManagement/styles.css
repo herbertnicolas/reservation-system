@@ -1,0 +1,9 @@
+.layout {
+    display: flex;
+    min-height: 100vh; /* Garante que a altura mínima seja 100% da altura da viewport */
+  }
+  
+  .content {
+    flex: 1; /* Faz com que o conteúdo principal ocupe o espaço restante */
+    padding: 16px; /* Adicione um padding para dar espaço ao conteúdo */
+}
