@@ -2,9 +2,9 @@ import { Grid, Typography, Paper, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 // import { useState, useEffect } from "react";
 import { PrivateLayout } from "../../components/PrivateLayout/PrivateLayout";
-import { Users, User } from "lucide-react";
+import { NotepadText, Microscope } from "lucide-react";
 
-export default function Home() {
+export default function ManageOptions() {
   const navigate = useNavigate();
 
   return (
@@ -26,7 +26,7 @@ export default function Home() {
               Seja bem-vindo ao Sistema de Reservas - ESS!
             </Typography>
             <Typography variant="h5" color="textSecondary" sx={{ mt: 4 }}>
-              Selecione um tipo de usuário
+              Selecione uma opção
             </Typography>
           </Grid>
 
@@ -34,7 +34,7 @@ export default function Home() {
             {/* Card Webhooks */}
             <Grid item xs={12} md={6}>
               <Paper 
-                onClick={() => navigate('/alunos')}
+                onClick={() => navigate('/reservar-sala')}
                 elevation={2} 
                 sx={{ 
                   borderRadius: '16px',
@@ -54,9 +54,9 @@ export default function Home() {
                   }
                 }}
               >
-                <Users size={80} color="#1976d2" strokeWidth={1.5} />
+                <Microscope size={80} color="#1976d2" strokeWidth={1.5} />
                 <Typography variant="h5" sx={{ mt: 3, fontWeight: 500 }}>
-                  Alunos
+                  Gerenciar recursos
                 </Typography>
               </Paper>
             </Grid>
@@ -64,7 +64,7 @@ export default function Home() {
             {/* Card Monitoramento */}
             <Grid item xs={12} md={6}>
               <Paper 
-                onClick={() => navigate('/administrador')}
+                onClick={() => navigate('/verificar-reservas')}
                 elevation={2} 
                 sx={{ 
                   borderRadius: '16px',
@@ -84,9 +84,9 @@ export default function Home() {
                   }
                 }}
               >
-                <User size={80} color="#1976d2" strokeWidth={1.5} />
+                <NotepadText size={80} color="#1976d2" strokeWidth={1.5} />
                 <Typography variant="h5" sx={{ mt: 3, fontWeight: 500 }}>
-                  Administrador
+                  Verificar reservas
                 </Typography>
               </Paper>
             </Grid>
