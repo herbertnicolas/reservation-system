@@ -7,7 +7,7 @@ const {
 } = require('../controllers/VerificarReservas/verificarreservasController');
 
 router.get('/', listarReservas);
-router.get('/status/:status', filtrarReservas);
-router.put('/:id/status', modificarStatusReserva);
+router.get('/status', filtrarReservas);
+router.put('/:id', modificarStatusReserva);
 
 module.exports = router;

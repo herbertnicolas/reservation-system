@@ -59,7 +59,14 @@ const modificarStatusReserva = async (req, res) => {
 
 const filtrarReservas = async (req, res) => {
     try {
-        const { status } = req.params;
+        const { status } = req.query;
+
+        if (!status) {
+            return res.status(400).json({
+                msg: 'ERRO: É necessário escolher um status.',
+            });
+        }
+
         const reservas = await Reserva.find({ statusReserva: status });
 
         if (reservas.length === 0) {
