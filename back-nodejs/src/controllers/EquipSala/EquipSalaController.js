@@ -138,7 +138,7 @@ const updateEquipamentoInSala = async (req, res) => {
   }
 };
 
-const getEquipamentosInSala = async (req, res) => { // -> aqui vai: filtrar, agrupar e ordenar (listas)
+const getEquipamentosInSala = async (req, res) => {
   try {
     const { salaId } = req.params;
 
