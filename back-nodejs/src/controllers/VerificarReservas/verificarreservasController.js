@@ -88,8 +88,32 @@ const filtrarReservas = async (req, res) => {
     }
 };
 
+const buscarReservaId = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const reserva = await Reserva.findById(id);
+
+        if (!reserva) {
+            return res.status(404).json({
+                msg: "ERRO: Reserva não encontrada."
+            });
+        }
+
+        return res.status(200).json({
+            msg: "Reserva encontrada.",
+            data: reserva
+        });
+    } catch (err) {
+        return res.status(500).json({
+            msg: "ERRO: Não foi possível buscar a reserva.",
+            error: err.message
+        });
+    }
+};
+
 module.exports = {
     listarReservas,
     modificarStatusReserva,
-    filtrarReservas
+    filtrarReservas,
+    buscarReservaId
 };

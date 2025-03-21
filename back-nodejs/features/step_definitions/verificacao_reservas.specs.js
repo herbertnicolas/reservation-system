@@ -18,7 +18,7 @@ Given('Existem as seguintes reservas cadastradas:', async function (reservasTabl
     const reservas = reservasTable.hashes();
     for (const reserva of reservas) {
         await Reserva.create({
-            _id: new mongoose.Types.ObjectId(),
+            _id: reserva.ID,
             tipo: reserva.Tipo,
             statusReserva: reserva.Status.toLowerCase()
         });
@@ -57,6 +57,7 @@ Then('Eu recebo uma resposta com status {int} OK', async function (codStatus) {
 });
 
 //listagem de todas as reservas
+//rodando
 Then('O corpo da resposta contém uma lista de todas as reservas com status {string}, {string} e {string}:', async function (status1, status2, status3, docString) {
     const responseBody = JSON.parse(docString);
     const reservas = responseBody.reservas;
@@ -71,13 +72,14 @@ Then('O corpo da resposta contém uma lista de todas as reservas com status {str
 Then('Uma requisição GET para o endpoint {string} retorna o status da reserva como {string}', async function (endpoint, statusEsperado) {
     const res = await request(app)
         .get(endpoint)
-        .set('Authorization', `Bearer ${token}`);
+        .set('Authorization', `Bearer ${this.token}`);
 
     expect(res.status).to.equal(200);
-    expect(res.body.statusReserva).to.equal(statusEsperado.toLowerCase());
+    expect(res.body.data.statusReserva).to.equal(statusEsperado.toLowerCase());
 });
 
 //filtragem das reservas pendentes
+//rodando
 Then('O corpo da resposta contém uma lista de todas as reservas com status {string}', function (statusFiltro) {
     const reservas = this.response.body.data;
     expect(reservas).to.be.an('array').that.is.not.empty;
