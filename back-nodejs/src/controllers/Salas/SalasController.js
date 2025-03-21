@@ -1,4 +1,5 @@
 const Room = require("../../models/Salas");
+const validateRoomData = require('../middlewares/roomValidation');
 
 const getRooms = async (req, resp) => {
     try {
@@ -37,19 +38,8 @@ const getRoom = async (req, res) => {
   }
 };
 
-const createRoom = async (req, res) => {
+const createRoom = [validateRoomData, async (req, res) => {
   const { identificador, localizacao, capacidade } = req.body;
-  if (typeof identificador !== 'string') {
-    return res.status(400).json({
-      erro: "Identificador deve ser uma string!",
-    });
-  }
-
-  if (typeof capacidade !== 'number') {
-    return res.status(400).json({
-      erro: "Capacidade deve ser um número!",
-    });
-  }
   const existingRoom = await Room.findOne({ identificador, localizacao, capacidade });
   if (existingRoom) {
     return res.status(400).json({
@@ -71,24 +61,11 @@ const createRoom = async (req, res) => {
       erro: "Erro ao criar sala",
     });
   }
-};
+}];
 
-const updateRoom = async (req, res) => {
+const updateRoom = [validateRoomData, async (req, res) => {
   const { id } = req.params;
-  const { identificador, localizacao, capacidade } = req.body; // Pegue todos os campos
-
-  if (typeof identificador !== 'string') {
-    return res.status(400).json({
-      erro: "Identificador deve ser uma string!",
-    });
-  }
-
-  if (typeof capacidade !== 'number') {
-    return res.status(400).json({
-      erro: "Capacidade deve ser um número!",
-    });
-  }
-
+  const { identificador, localizacao, capacidade } = req.body;
   try {
     const room = await Room.findById(id);
     if (!room) {
@@ -116,7 +93,7 @@ const updateRoom = async (req, res) => {
       erro: "Erro ao editar sala",
     });
   }
-};
+}];
 const deleteRoom = async (req, resp) => {
     try {
         const { id } = req.params;
