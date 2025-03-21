@@ -161,6 +161,7 @@ export default function EditEquipmentForm() {
                 type="number"
                 value={formData.quantidade}
                 onChange={(e) => setFormData({ ...formData, quantidade: e.target.value })}
+                onKeyDown={(e) => {if (['e', 'E', '+', '-'].includes(e.key)) { e.preventDefault(); }}}
                 className="bg-white"
                 min="1"
               />

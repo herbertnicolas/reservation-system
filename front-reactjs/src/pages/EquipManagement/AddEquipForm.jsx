@@ -15,11 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import "./style.css";
+
 
 export default function AddEquipForm() {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState([]);
+  const [equipamentos, setEquipamentos] = useState([]);
   const [formData, setFormData] = useState({
     salaId: "",
     equipNome: "",
@@ -27,17 +28,48 @@ export default function AddEquipForm() {
   });
 
   useEffect(() => {
-    const fetchRooms = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3001/salas");
-        const data = await response.json();
-        setRooms(data);
+        // Buscar salas
+        const roomsResponse = await fetch("http://localhost:3001/salas");
+        const roomsData = await roomsResponse.json();
+        setRooms(roomsData);
+
+        // Buscar equipamentos existentes
+        const equipsResponse = await fetch("http://localhost:3001/equipsala");
+        const equipsData = await equipsResponse.json();
+        const uniqueEquips = [...new Set(equipsData.data.map(item => ({
+          id: item.equipamento._id,
+          nome: item.equipamento.nome
+        })))];
+        setEquipamentos(uniqueEquips);
       } catch (error) {
-        toast.error("Erro ao carregar salas");
+        toast.error("Erro ao carregar dados");
       }
     };
-    fetchRooms();
+    fetchData();
   }, []);
+
+  const handleInputChange = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFormData(prev => ({
+      ...prev,
+      equipamentoId: "",
+      equipNome: e.target.value
+    }));
+  };
+  
+  const handleEquipSelect = (value) => {
+    const existingEquip = equipamentos.find(e => e.id === value);
+    if (existingEquip) {
+      setFormData(prev => ({
+        ...prev,
+        equipamentoId: value,
+        equipNome: existingEquip.nome
+      }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -126,14 +158,42 @@ export default function AddEquipForm() {
 
             {/* Seleção de equipamento */}
             <Grid2 size={4} className="grid w-full max-w-sm items-center gap-1.5">
-              <Label>Nome do Equipamento</Label>
-              <Input
-                type="text"
-                placeholder="Digite o nome do equipamento"
-                value={formData.equipNome}
-                onChange={(e) => setFormData({ ...formData, equipNome: e.target.value })}
-                className="bg-white"
-              />
+              <Label>Equipamento</Label>
+              <Select
+                value={formData.equipamentoId || "placeholder"}
+                onValueChange={handleEquipSelect}
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue>
+                    {formData.equipNome || "Selecione ou digite um equipamento"}
+                  </SelectValue> 
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="placeholder" disabled>
+                    Selecione ou digite um equipamento
+                  </SelectItem>
+                  <div className="mb-2 pb-2 border-b">
+                    <Input
+                      type="text"
+                      className="bg-white"
+                      autoComplete="off"
+                      placeholder="Digite para adicionar novo"
+                      value={formData.equipNome}
+                      onChange={handleInputChange}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.target.focus();
+                      }}
+                    />
+                  </div>
+                  {equipamentos.map((equip) => (
+                    <SelectItem key={equip.id} value={equip.id}>
+                      {equip.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Grid2>
 
             {/* Seleção de quantidade */}
