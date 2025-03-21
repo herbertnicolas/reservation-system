@@ -20,6 +20,10 @@ export default function EditEquipmentForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [rooms, setRooms] = useState([]);
+  const [equipInfo, setEquipInfo] = useState({
+    nome: "",
+    quantidadePorSala: {}
+  });
   const [formData, setFormData] = useState({
     salaId: "",
     quantidade: ""
@@ -31,24 +35,30 @@ export default function EditEquipmentForm() {
         const equipsalaResponse = await fetch("http://localhost:3001/equipsala");
         const equipsalaData = await equipsalaResponse.json();
         
-        const equipsala = equipsalaData.data.find(
+        const equipmentData = equipsalaData.data.filter(
           equip => equip.equipamento._id === id
         );
-
-        if (!equipsala) {
+        
+        if (equipmentData.length === 0) {
           throw new Error("Equipamento não encontrado");
         }
 
-        const uniqueRooms = [...new Map(
-          equipsalaData.data
-          .filter(item => item.equipamento._id === id)
-          .map(item => [item.sala._id, item.sala])
-        ).values()];
+        const quantidadePorSala = {};
+        equipmentData.forEach(item => {
+          quantidadePorSala[item.sala._id] = item.quantidade;
+        });
+
+        setEquipInfo({
+          nome: equipmentData[0].equipamento.nome,
+          quantidadePorSala
+        });
+
+        const salasComEquipamento = equipmentData.map(item => item.sala);
         
-        setRooms(uniqueRooms);
+        setRooms(salasComEquipamento);
         setFormData({
-          salaId: equipsala.sala._id,
-          quantidade: equipsala.quantidade.toString(),
+          salaId: equipmentData[0].sala._id,
+          quantidade: equipmentData[0].quantidade.toString(),
         });
 
       } catch (error) {
@@ -59,6 +69,13 @@ export default function EditEquipmentForm() {
 
     fetchData();
   }, [id]);
+
+  const handleSalaChange = (value) => {
+    setFormData({
+      salaId: value,
+      quantidade: equipInfo.quantidadePorSala[value]?.toString() || "0"
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -101,12 +118,21 @@ export default function EditEquipmentForm() {
           <Grid2 size={12}>
             <Typography variant="h4">Editar Equipamento</Typography>
             <Divider />
+            <Typography 
+              variant="h6" 
+              className="mt-4 text-gray-700 font-semibold"  
+              style={{ 
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '1.5rem'  
+              }}
+            >
+              Editando: {equipInfo.nome}
+            </Typography>
           </Grid2>
           <Grid2 size={12} className="grid mt-8">
             <Typography variant="h6">Informações gerais</Typography>
           </Grid2>
           <Grid2
-            
             size={12}
             className="flex items-center justify-between gap-5"
             style={{ maxWidth: "70vw" }}
@@ -115,7 +141,7 @@ export default function EditEquipmentForm() {
               <Label>Na Sala:</Label>
               <Select
                 value={formData.salaId}
-                onValueChange={(value) => setFormData({ ...formData, salaId: value })}
+                onValueChange={handleSalaChange}
               >
                 <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Selecione uma sala" />
