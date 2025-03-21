@@ -66,6 +66,14 @@ const createRoom = [validateRoomData, async (req, res) => {
 const updateRoom = [validateRoomData, async (req, res) => {
   const { id } = req.params;
   const { identificador, localizacao, capacidade } = req.body;
+  
+  const existingRoom = await Room.findOne({ identificador, localizacao, capacidade });
+  if (existingRoom) {
+    return res.status(400).json({
+      erro: `Sala com identificador ${identificador}, localização ${localizacao} e capacidade ${capacidade} já existe!`,
+    });
+  }
+
   try {
     const room = await Room.findById(id);
     if (!room) {

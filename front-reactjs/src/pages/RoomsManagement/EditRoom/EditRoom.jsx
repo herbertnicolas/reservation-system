@@ -35,15 +35,21 @@ export default function EditRoom() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await fetch(`http://localhost:3001/salas/${id}`, {
+      const response = await fetch(`http://localhost:3001/salas/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(roomData),
       });
+
+      if(!response.ok){
+        const errorData = await response.json();
+        throw new Error(errorData.erro);
+      }
+
       toast.success("Sala atualizada com sucesso!");
       navigate("/gestao-salas");
     } catch (error) {
-      toast.error("Erro ao atualizar sala");
+      toast.error(error.message);
     }
   };
 
