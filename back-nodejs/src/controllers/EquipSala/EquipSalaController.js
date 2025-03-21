@@ -109,7 +109,7 @@ const updateEquipamentoInSala = async (req, res) => {
     }
 
     // validacao da quantidade
-    const qtd_ = quantidade; // Converte para número
+    const qtd_ = Number(quantidade); 
     if (isNaN(qtd_) || !Number.isInteger(qtd_) || qtd_ < 0) {
       return res.status(400).json({ msg: 'Quantidade deve ser um inteiro maior ou igual a zero' });
     }

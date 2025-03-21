@@ -21,6 +21,7 @@ export default function AddEquipForm() {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState([]);
   const [equipamentos, setEquipamentos] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
   const [formData, setFormData] = useState({
     salaId: "",
     equipNome: "",
@@ -38,10 +39,24 @@ export default function AddEquipForm() {
         // Buscar equipamentos existentes
         const equipsResponse = await fetch("http://localhost:3001/equipsala");
         const equipsData = await equipsResponse.json();
-        const uniqueEquips = [...new Set(equipsData.data.map(item => ({
-          id: item.equipamento._id,
-          nome: item.equipamento.nome
-        })))];
+
+        // Map para eliminar duplicatas usando o nome como chave
+        const uniqueEquipsMap = new Map();
+        equipsData.data.forEach(item => {
+          uniqueEquipsMap.set(item.equipamento.nome, {
+            id: item.equipamento._id,
+            nome: item.equipamento.nome
+          });
+        });
+        
+        // Map para array ordenado
+        const uniqueEquips = Array.from(uniqueEquipsMap.values()).sort(
+          (a,b) => {
+          if (a.nome < b.nome) return -1;
+          if (a.nome > b.nome) return 1;
+          return 0;
+        });
+
         setEquipamentos(uniqueEquips);
       } catch (error) {
         toast.error("Erro ao carregar dados");
@@ -53,6 +68,7 @@ export default function AddEquipForm() {
   const handleInputChange = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsTyping(true);
     setFormData(prev => ({
       ...prev,
       equipamentoId: "",
@@ -61,6 +77,8 @@ export default function AddEquipForm() {
   };
   
   const handleEquipSelect = (value) => {
+    if (isTyping) return;
+
     const existingEquip = equipamentos.find(e => e.id === value);
     if (existingEquip) {
       setFormData(prev => ({
@@ -180,6 +198,7 @@ export default function AddEquipForm() {
                       placeholder="Digite para adicionar novo"
                       value={formData.equipNome}
                       onChange={handleInputChange}
+                      onBlur={() => setIsTyping(false)}
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -188,7 +207,7 @@ export default function AddEquipForm() {
                     />
                   </div>
                   {equipamentos.map((equip) => (
-                    <SelectItem key={equip.id} value={equip.id}>
+                    <SelectItem key={equip.id} value={equip.id} disabled={isTyping}>
                       {equip.nome}
                     </SelectItem>
                   ))}
