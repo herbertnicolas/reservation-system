@@ -3,9 +3,12 @@ import {
   AudioWaveform,
   Command,
   GalleryVerticalEnd,
+  LucideWrench,
+  Monitor,
   PieChart,
   SquareTerminal,
   Users,
+  WrenchIcon,
 } from "lucide-react";
 
 import { NavMain } from "../components/nav-main"
@@ -74,15 +77,15 @@ export function AppSidebar({ ...props }) {
       {
         title: "Gestão de Equipamentos",
         url: "#",
-        icon: Users,
+        icon: Monitor,
         items: [
-          {
-            title: "Cadastro de equipamento",
-            url: "/equipamento-cadastro",
-          },
           {
             title: "Equipamentos de Sala",
             url: "/equipamento-gestao",
+          },
+          {
+            title: "Cadastro de equipamento",
+            url: "/equipamento-cadastro",
           },
         ],
       },

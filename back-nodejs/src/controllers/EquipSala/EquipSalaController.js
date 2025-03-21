@@ -14,9 +14,9 @@ const addEquipamentoToSala = async (req, res) => {
     if (!mongoose.isValidObjectId(salaId)) {
       return res.status(400).json({ msg: 'ID(s) fornecido(s) inválido(s)' });
     }
-    
+
     // verificar input valido para quantidade
-    let qtd_ = Number(quantidade);
+    const qtd_ = Number(quantidade);
     if (isNaN(qtd_) || !Number.isInteger(qtd_) || qtd_ <= 0) {
       return res.status(400).json({ msg: 'Quantidade deve ser um número inteiro maior que zero' });
     }
@@ -32,11 +32,22 @@ const addEquipamentoToSala = async (req, res) => {
       if(!equipamento){
         equipamento = new Equipamento({nome: equipNome});
         await equipamento.save();
-        equipamentoId = equipamento._id;
       }
+      equipamentoId = equipamento._id;
     }
 
-    const equipSala = new EquipSala({ salaId, equipamentoId, quantidade });
+    let equipSala = await EquipSala.findOne({ salaId: salaId, equipamentoId: equipamentoId});
+    if(equipSala){
+      equipSala.quantidade += qtd_;
+      await equipSala.save();
+      return res.status(201).json({
+        msg: 'Equipamento atualizado com sucesso',
+        data: equipSala
+      })
+    }
+
+    equipSala = new EquipSala({salaId, equipamentoId, quantidade: qtd_});    
+
     await equipSala.save();
     return res.status(201).json({ 
       msg: 'Equipamento adicionado à sala com sucesso', 
@@ -58,7 +69,6 @@ const removeEquipamentoFromSala = async (req, res) => {
     if (!mongoose.isValidObjectId(salaId) || !mongoose.isValidObjectId(equipamentoId)) {
       return res.status(400).json({ msg: 'ID(s) fornecido(s) inválido(s)' });
     }
-    
     
     // verifica se existe o equipamento na sala; indiretamente tambem verifica se o equipamento existe
     const equipSala = await EquipSala.findOne({ salaId, equipamentoId });
@@ -99,8 +109,8 @@ const updateEquipamentoInSala = async (req, res) => {
     }
 
     // validacao da quantidade
-    quantidade = Number(quantidade); // Converte para número
-    if (isNaN(quantidade) || quantidade < 0) {
+    const qtd_ = quantidade; // Converte para número
+    if (isNaN(qtd_) || !Number.isInteger(qtd_) || qtd_ < 0) {
       return res.status(400).json({ msg: 'Quantidade deve ser um inteiro maior ou igual a zero' });
     }
 
@@ -111,7 +121,7 @@ const updateEquipamentoInSala = async (req, res) => {
     }
 
     // se a quantidade for 0, remover o equipamento da sala
-    if (quantidade === 0) {
+    if (qtd_ === 0) {
       // verifica se há reservas ativas antes de excluir
       if (equipSala.datasReservas.length > 0) {
         return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
@@ -122,7 +132,7 @@ const updateEquipamentoInSala = async (req, res) => {
     }
 
     // Atualiza a quantidade do equipamento na sala
-    equipSala.quantidade = quantidade;
+    equipSala.quantidade = qtd_;
     await equipSala.save();
 
     return res.status(200).json({ 
@@ -206,7 +216,8 @@ const getAllEquipSala = async (req, res) => {
           _id: equipSala.salaId._id,
           identificador: equipSala.salaId.identificador
         },
-        quantidade: equipSala.quantidade
+        quantidade: equipSala.quantidade,
+        dataReservas: equipSala.datasReservas
       });
     }
 

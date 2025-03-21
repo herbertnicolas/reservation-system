@@ -79,7 +79,7 @@ export function DataTableEquip({ columns, data }) {
       >
         <Grid2 item className="w-1/3">
           <Input
-            placeholder="Pesquisar equipamentos..."
+            placeholder="Inserir valor do parâmetro de busca..."
             value={filterValue}
             onChange={handleFilterChange}
             className="max-w-sm bg-white"

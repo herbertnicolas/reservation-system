@@ -17,7 +17,7 @@ export function DeleteConfirmationDialog({ isOpen, onClose, onConfirm }) {
                 Deseja realmente remover o equipamento?
             </DialogTitle>
             <DialogDescription className="mt-2 text-sm text-gray-600">
-                Essa ação não poderá ser desfeita.
+                O equipamento ainda estará disponível para ser adicionado novamente.
             </DialogDescription>
             <div className="mt-4 flex justify-end space-x-2">
                 <Button variant="outline" onClick={onClose}>

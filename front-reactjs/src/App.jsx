@@ -13,8 +13,8 @@ import StudentOptions from "./pages/StudentOptions/StudentOptions";
 import AdminOptions from "./pages/AdminOptions/AdminOptions";
 
 import EquipManagement from "./pages/EquipManagement/EquipManagement"; // Corrigido
-import AddEquipForm from "./pages/EquipManagement/components/Forms/AddEquipForm"; // Corrigido
-import EditEquipForm from "./pages/EquipManagement/components/Forms/EditEquipForm"; // Corrigido
+import AddEquipForm from "./pages/EquipManagement/AddEquipForm"; // Corrigido
+import EditEquipForm from "./pages/EquipManagement/EditEquipForm"; // Corrigido
 
 const App = () => {
   return (

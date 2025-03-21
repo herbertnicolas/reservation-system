@@ -10,6 +10,13 @@ import { columns } from "./components/Table/Columns";
 import { DeleteConfirmationDialog } from "./components/DeleteConfirmation";
 import { toast } from "react-toastify";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
+
 export default function EquipManagement() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,24 +73,33 @@ export default function EquipManagement() {
     cell: ({ row }) => {
       const equiproom = row.original;
       return (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
+        <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" style={{ backgroundColor: "white" }}>
+          <DropdownMenuItem
+            className="cursor-pointer hover:bg-gray-100"
             onClick={() => handleEdit(equiproom.equipamento._id)}
           >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
+            <Edit className="mr-2 h-3 w-4" />
+            Editar
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer hover:bg-gray-100"
             onClick={() => {
               setSelectedEquipId(equiproom.equipamento._id);
               setSelectedSalaId(equiproom.sala._id);
               setIsModalOpen(true);
             }}
           >
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
+            <Trash className="mr-2 h-4 w-4" style={{ color: "red" }} />
+            Excluir
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       );
     },
   };
@@ -92,10 +108,10 @@ export default function EquipManagement() {
     <>
       <PrivateLayout>
         <Grid2 container className="grid grid-rows-1 flex-grow p-4 w-auto h-fit mx-2">
-          <Grid2 id="main" item xs={12} className="p-4">
+          <Grid2 id="main" size={12} className="p-4">
             <Typography variant="h4">Gestão de Equipamentos</Typography>
           </Grid2>
-          <Grid2 item xs={12} className="p-4">
+          <Grid2 size={12} className="p-4">
             <DataTableEquip 
               columns={[...columns, actionColumn]} 
               data={equipmentData} 
