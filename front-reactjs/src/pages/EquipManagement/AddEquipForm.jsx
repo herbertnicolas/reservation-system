@@ -37,21 +37,20 @@ export default function AddEquipForm() {
         setRooms(roomsData);
 
         // Buscar equipamentos existentes
-        const equipsResponse = await fetch("http://localhost:3001/equipsala");
+        const equipsResponse = await fetch("http://localhost:3001/equipamentos");
         const equipsData = await equipsResponse.json();
 
         // Map para eliminar duplicatas usando o nome como chave
         const uniqueEquipsMap = new Map();
         equipsData.data.forEach(item => {
-          uniqueEquipsMap.set(item.equipamento.nome, {
-            id: item.equipamento._id,
-            nome: item.equipamento.nome
+          uniqueEquipsMap.set(item.nome, {
+            id: item._id,
+            nome: item.nome
           });
         });
         
         // Map para array ordenado
-        const uniqueEquips = Array.from(uniqueEquipsMap.values()).sort(
-          (a,b) => {
+        const uniqueEquips = Array.from(uniqueEquipsMap.values()).sort((a,b) => {
           if (a.nome < b.nome) return -1;
           if (a.nome > b.nome) return 1;
           return 0;
