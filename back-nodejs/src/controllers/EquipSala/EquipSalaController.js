@@ -1,8 +1,8 @@
+const mongoose = require('mongoose');
 const EquipSala = require('../../models/EquipSala');
 const Equipamento = require('../../models/Equipamento');
 const Reserva = require('../../models/Reserva');
 const Room = require('../../models/Salas')
-const mongoose = require('mongoose');
 
 
 const addEquipamentoToSala = async (req, res) => {
@@ -14,9 +14,9 @@ const addEquipamentoToSala = async (req, res) => {
     if (!mongoose.isValidObjectId(salaId)) {
       return res.status(400).json({ msg: 'ID(s) fornecido(s) inválido(s)' });
     }
-    
+
     // verificar input valido para quantidade
-    let qtd_ = Number(quantidade);
+    const qtd_ = Number(quantidade);
     if (isNaN(qtd_) || !Number.isInteger(qtd_) || qtd_ <= 0) {
       return res.status(400).json({ msg: 'Quantidade deve ser um número inteiro maior que zero' });
     }
@@ -32,11 +32,22 @@ const addEquipamentoToSala = async (req, res) => {
       if(!equipamento){
         equipamento = new Equipamento({nome: equipNome});
         await equipamento.save();
-        equipamentoId = equipamento._id;
       }
+      equipamentoId = equipamento._id;
     }
 
-    const equipSala = new EquipSala({ salaId, equipamentoId, quantidade });
+    let equipSala = await EquipSala.findOne({ salaId: salaId, equipamentoId: equipamentoId});
+    if(equipSala){
+      equipSala.quantidade += qtd_;
+      await equipSala.save();
+      return res.status(201).json({
+        msg: 'Equipamento atualizado com sucesso',
+        data: equipSala
+      })
+    }
+
+    equipSala = new EquipSala({salaId, equipamentoId, quantidade: qtd_});    
+
     await equipSala.save();
     return res.status(201).json({ 
       msg: 'Equipamento adicionado à sala com sucesso', 
@@ -58,7 +69,6 @@ const removeEquipamentoFromSala = async (req, res) => {
     if (!mongoose.isValidObjectId(salaId) || !mongoose.isValidObjectId(equipamentoId)) {
       return res.status(400).json({ msg: 'ID(s) fornecido(s) inválido(s)' });
     }
-    
     
     // verifica se existe o equipamento na sala; indiretamente tambem verifica se o equipamento existe
     const equipSala = await EquipSala.findOne({ salaId, equipamentoId });
@@ -88,7 +98,57 @@ const removeEquipamentoFromSala = async (req, res) => {
   }
 };
 
-const getEquipamentosInSala = async (req, res) => { // -> aqui vai: filtrar, agrupar e ordenar (listas)
+const updateEquipamentoInSala = async (req, res) => {
+  try {
+    const { salaId, equipamentoId } = req.params;
+    let { quantidade } = req.body;
+
+    // validacao dos IDs
+    if (!mongoose.isValidObjectId(salaId) || !mongoose.isValidObjectId(equipamentoId)) {
+      return res.status(400).json({ msg: 'ID(s) fornecido(s) inválido(s)' });
+    }
+
+    // validacao da quantidade
+    const qtd_ = Number(quantidade); 
+    if (isNaN(qtd_) || !Number.isInteger(qtd_) || qtd_ < 0) {
+      return res.status(400).json({ msg: 'Quantidade deve ser um inteiro maior ou igual a zero' });
+    }
+
+    // verifica se o equipamento está cadastrado na sala
+    const equipSala = await EquipSala.findOne({ salaId, equipamentoId });
+    if (!equipSala) {
+      return res.status(404).json({ msg: 'Nenhum Equipamento encontrado para esta sala' });
+    }
+
+    // se a quantidade for 0, remover o equipamento da sala
+    if (qtd_ === 0) {
+      // verifica se há reservas ativas antes de excluir
+      if (equipSala.datasReservas.length > 0) {
+        return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
+      }
+
+      await EquipSala.deleteOne(equipSala._id);
+      return res.status(200).json({ msg: 'Equipamento removido da sala com sucesso' });
+    }
+
+    // Atualiza a quantidade do equipamento na sala
+    equipSala.quantidade = qtd_;
+    await equipSala.save();
+
+    return res.status(200).json({ 
+      msg: 'Equipamento atualizado com sucesso', 
+      data: equipSala 
+    });
+
+  } catch (error) {
+    return res.status(500).json({ 
+      msg: 'Erro interno no servidor', 
+      error: error.message
+    });
+  }
+};
+
+const getEquipamentosInSala = async (req, res) => {
   try {
     const { salaId } = req.params;
 
@@ -133,51 +193,42 @@ const getEquipamentosInSala = async (req, res) => { // -> aqui vai: filtrar, agr
   }
 };
 
-const updateEquipamentoInSala = async (req, res) => {
+const getAllEquipSala = async (req, res) => {
   try {
-    const { salaId, equipamentoId } = req.params;
-    let { quantidade } = req.body;
+    const equipamentos = await EquipSala.find()
+      .populate('salaId')
+      .populate('equipamentoId');
 
-    // validacao dos IDs
-    if (!mongoose.isValidObjectId(salaId) || !mongoose.isValidObjectId(equipamentoId)) {
-      return res.status(400).json({ msg: 'ID(s) fornecido(s) inválido(s)' });
+    if (equipamentos.length === 0) {
+      return res.status(404).json({ 
+        msg: 'Nenhum equipamento encontrado em nenhuma sala' 
+      });
     }
 
-    // validacao da quantidade
-    quantidade = Number(quantidade); // Converte para número
-    if (isNaN(quantidade) || quantidade < 0) {
-      return res.status(400).json({ msg: 'Quantidade deve ser um inteiro maior ou igual a zero' });
+    let bodyData = [];
+    for (let equipSala of equipamentos) {
+      bodyData.push({
+        equipamento: {
+          _id: equipSala.equipamentoId._id,
+          nome: equipSala.equipamentoId.nome
+        },
+        sala: {
+          _id: equipSala.salaId._id,
+          identificador: equipSala.salaId.identificador
+        },
+        quantidade: equipSala.quantidade,
+        dataReservas: equipSala.datasReservas
+      });
     }
 
-    // verifica se o equipamento está cadastrado na sala
-    const equipSala = await EquipSala.findOne({ salaId, equipamentoId });
-    if (!equipSala) {
-      return res.status(404).json({ msg: 'Nenhum Equipamento encontrado para esta sala' });
-    }
-
-    // se a quantidade for 0, remover o equipamento da sala
-    if (quantidade === 0) {
-      // verifica se há reservas ativas antes de excluir
-      if (equipSala.datasReservas.length > 0) {
-        return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
-      }
-
-      await EquipSala.deleteOne(equipSala._id);
-      return res.status(200).json({ msg: 'Equipamento removido da sala com sucesso' });
-    }
-
-    // Atualiza a quantidade do equipamento na sala
-    equipSala.quantidade = quantidade;
-    await equipSala.save();
-
-    return res.status(200).json({ 
-      msg: 'Equipamento atualizado com sucesso', 
-      data: equipSala 
+    return res.status(200).json({
+      msg: 'Equipamentos listados com sucesso',
+      data: bodyData
     });
 
   } catch (error) {
-    return res.status(500).json({ 
-      msg: 'Erro interno no servidor', 
+    return res.status(500).json({
+      msg: 'Erro interno no servidor',
       error: error.message
     });
   }
@@ -198,8 +249,9 @@ const getEquipIdByName = async (equipamento) => {
 module.exports = {
   addEquipamentoToSala,
   removeEquipamentoFromSala,
-  getEquipamentosInSala,
   updateEquipamentoInSala,
+  getEquipamentosInSala,
+  getAllEquipSala,
   getSalaIdByName,
   getEquipIdByName
 };

@@ -11,7 +11,10 @@ import "primereact/resources/primereact.min.css";
 import "./output.css";
 import StudentOptions from "./pages/StudentOptions/StudentOptions";
 import AdminOptions from "./pages/AdminOptions/AdminOptions";
-/*import ReservationsManagement from "./pages/ReservationsManagement/ReservationsManagement";*/
+/*Equipamentos*/
+import EquipManagement from "./pages/EquipManagement/EquipManagement";
+import AddEquipForm from "./pages/EquipManagement/AddEquipForm";
+import EditEquipForm from "./pages/EquipManagement/EditEquipForm"; 
 
 const App = () => {
   return (
@@ -25,8 +28,10 @@ const App = () => {
         <Route path="/gestao-salas" element={<RoomsManagement />} />
         <Route path="/sala-cadastro" element={<CreateRoom />} />
         <Route path="/editar-sala/:id" element={<EditRoom />} />
-        {/* RESERVAS */}
-        {/* <Route path="/gestao-reservas" element={<ReservationsManagement />} /> */}
+        {/* EQUIPAMENTOS */}
+        <Route path="/equipamento-gestao" element={<EquipManagement />} /> {/* Corrigido */}
+        <Route path="/equipamento-cadastro" element={<AddEquipForm />} /> {/* Corrigido */}
+        <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> {/* Corrigido */}
       </Routes>
       <ToastContainer />
     </Router>

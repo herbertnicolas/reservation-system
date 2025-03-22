@@ -11,7 +11,6 @@ const Room = require('../../src/models/Salas');
 const { 
   getSalaIdByName, 
   getEquipIdByName, 
-  getEquipSalaByName 
 } = require('../../src/controllers/EquipSala/EquipSalaController');
 
 Before(async () => {
@@ -140,6 +139,11 @@ When('o administrador faz uma requisição GET para a sala {string}',
     .get(`/equipsala/${salaId}`);
 });
 
+When('o administrador faz uma requisição GET para listar todos os equipamentos', async function () {
+  response = await request(server)
+    .get('/equipsala');
+});
+
 When('o administrador faz uma requisição PUT para o recurso {string} na sala {string} com quantidade {string}' , 
   async function (recurso, sala, quantidade) {
   const salaId = await getSalaIdByName(sala);
@@ -184,6 +188,21 @@ Then('o recurso {string} permanece na base de dados geral para associações fut
   strictEqual(equipId !== null, true);
 });
 
+Then('o sistema retorna a lista completa de recursos:', async function (dataTable) {
+  const listaRecursos = dataTable.hashes();
+  const equipamentos = response.body.data;
+  
+  strictEqual(equipamentos.length, listaRecursos.length);
+  
+  for (const recurso of listaRecursos) {
+    const encontrado = equipamentos.some(equip => 
+      equip.sala.identificador === recurso.Sala &&
+      equip.equipamento.nome === recurso.Recurso &&
+      equip.quantidade === parseInt(recurso.Quantidade)
+    );
+    strictEqual(encontrado, true);
+  }
+});
 
 Then('o sistema retorna a lista de recursos da sala:', async function (dataTable) {
   const listaRecursos = dataTable.hashes(); // Converte para array de objetos
