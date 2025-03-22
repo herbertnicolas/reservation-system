@@ -45,6 +45,7 @@ export function ConfirmReservationModal({
           </DialogDescription> */}
           <div className="justify-center mt-4">
             <Calendar
+              id="calendar"
               mode="single"
               selected={date}
               onSelect={setDate}

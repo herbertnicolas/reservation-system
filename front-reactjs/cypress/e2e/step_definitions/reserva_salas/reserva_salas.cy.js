@@ -61,6 +61,17 @@ When("o usuário seleciona uma data já reservada", () => {
   cy.get("[role='dialog'] button:not([disabled])").first().click();
 });
 
+When("o usuário seleciona a data futura ", (date) => {
+  // Simular data reservada (intercept API para retornar erro)
+  cy.intercept("POST", "http://localhost:3001/reservas", {
+    statusCode: 400,
+    body: { msg: "Esta sala já está reservada para esta data" }
+  }).as("reservaFalha");
+  
+  // Selecionar qualquer data (o intercept simulará o erro)
+  cy.get("[role='dialog'] button:not([disabled])").first().click();
+});
+
 When("seleciona o botão {string}", (buttonText) => {
   cy.get("[role='dialog'] button").contains(buttonText).click();
 });
