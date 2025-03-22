@@ -11,7 +11,7 @@ import "primereact/resources/primereact.min.css";
 import "./output.css";
 import StudentOptions from "./pages/StudentOptions/StudentOptions";
 import AdminOptions from "./pages/AdminOptions/AdminOptions";
-import ReservationsManagement from "./pages/ReservationsManagement/ReservationsManagement";
+/*import ReservationsManagement from "./pages/ReservationsManagement/ReservationsManagement";*/
 
 const App = () => {
   return (

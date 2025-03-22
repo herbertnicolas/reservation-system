@@ -8,6 +8,7 @@ import { Undo } from "lucide-react";
 import { Divider } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { apiService } from '../../RoomsManagement/apiService';
 import "../styles.css";
 
 export default function EditRoom() {
@@ -35,15 +36,12 @@ export default function EditRoom() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await fetch(`http://localhost:3001/salas/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(roomData),
-      });
+      await apiService.updateRoom(id, roomData);
+
       toast.success("Sala atualizada com sucesso!");
       navigate("/gestao-salas");
     } catch (error) {
-      toast.error("Erro ao atualizar sala");
+      toast.error(error.message);
     }
   };
 
