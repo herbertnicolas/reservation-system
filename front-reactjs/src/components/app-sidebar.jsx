@@ -97,8 +97,12 @@ export function AppSidebar({ ...props }) {
         icon: PieChart,
         items: [
           {
-            title: "Gestão de Reservas",
-            url: "/reservas",
+            title: "Reserva de sala",
+            url: "/reservar-sala",
+          },
+          {
+            title: "Reserva de equipamento",
+            url: "/reservar-equipamento",
           },
         ],
       },

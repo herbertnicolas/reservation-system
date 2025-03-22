@@ -15,6 +15,8 @@ import AdminOptions from "./pages/AdminOptions/AdminOptions";
 import EquipManagement from "./pages/EquipManagement/EquipManagement";
 import AddEquipForm from "./pages/EquipManagement/AddEquipForm";
 import EditEquipForm from "./pages/EquipManagement/EditEquipForm"; 
+import RoomReservation from "./pages/ReservationsManagement/RoomReservation/RoomReservation";
+import EquipmentReservation from "./pages/ReservationsManagement/EquipmentReservation/EquipmentReservation";
 
 const App = () => {
   return (
@@ -29,6 +31,8 @@ const App = () => {
         <Route path="/sala-cadastro" element={<CreateRoom />} />
         <Route path="/editar-sala/:id" element={<EditRoom />} />
         {/* EQUIPAMENTOS */}
+        <Route path="/reservar-sala" element={<RoomReservation />} />
+        <Route path="/reservar-equipamento" element={<EquipmentReservation />} />
         <Route path="/equipamento-gestao" element={<EquipManagement />} /> {/* Corrigido */}
         <Route path="/equipamento-cadastro" element={<AddEquipForm />} /> {/* Corrigido */}
         <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> {/* Corrigido */}
