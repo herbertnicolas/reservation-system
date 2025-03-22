@@ -60,17 +60,13 @@ export default function CreateRoom({ children }) {
     navigate(-1);
   };
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   return (
     <PrivateLayout>
       <Grid container xs={12} className="flex items-center gap-6 h-max">
         <Grid
           item
           xs={12}
-          onClick={handleGoBack}
+          onClick={() => navigate(-1)}
           className="flex cursor-pointer"
         >
           <Undo />
