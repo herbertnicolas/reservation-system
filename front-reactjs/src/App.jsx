@@ -11,7 +11,6 @@ import "primereact/resources/primereact.min.css";
 import "./output.css";
 import StudentOptions from "./pages/StudentOptions/StudentOptions";
 import AdminOptions from "./pages/AdminOptions/AdminOptions";
-
 /*Equipamentos*/
 import EquipManagement from "./pages/EquipManagement/EquipManagement";
 import AddEquipForm from "./pages/EquipManagement/AddEquipForm";

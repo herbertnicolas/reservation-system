@@ -7,11 +7,11 @@ import { Button } from "../../../components/ui/button";
 import { Undo } from "lucide-react";
 import { Divider } from "antd";
 import { useNavigate } from "react-router-dom";
-import api from "../../../services/api";
 import "../styles.css";
+import { apiService } from '../../RoomsManagement/apiService';
 import { toast } from "react-toastify";
 
-export default function CreateRoom({ children }) {
+export default function CreateRoom() {
   const navigate = useNavigate();
   const [identificador, setIdentificador] = useState("");
   const [localizacao, setLocalizacao] = useState("");
@@ -33,16 +33,11 @@ export default function CreateRoom({ children }) {
     };
 
     try {
-      const response = await fetch("http://localhost:3001/salas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newRoom),
+      await apiService.createRoom({
+        identificador,
+        localizacao,
+        capacidade: Number(capacidade),
       });
-
-      if(!response.ok){
-        const errorData = await response.json();
-        throw new Error(errorData.erro);
-      }
 
       toast.success("Sala cadastrada com sucesso!");
       navigate("/gestao-salas");
@@ -60,17 +55,13 @@ export default function CreateRoom({ children }) {
     navigate(-1);
   };
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   return (
     <PrivateLayout>
       <Grid container xs={12} className="flex items-center gap-6 h-max">
         <Grid
           item
           xs={12}
-          onClick={handleGoBack}
+          onClick={() => navigate(-1)}
           className="flex cursor-pointer"
         >
           <Undo />

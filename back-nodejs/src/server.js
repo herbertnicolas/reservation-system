@@ -8,6 +8,7 @@ const reservasRoutes = require('./routes/reservas.routes.js');
 const verificarReservasRoutes = require('./routes/verificarreservas.routes.js');
 const { connectDB } = require('./database/index');
 
+
 const app = express();
 
 app.use(cors());

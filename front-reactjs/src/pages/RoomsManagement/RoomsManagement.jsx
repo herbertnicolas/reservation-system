@@ -21,10 +21,6 @@ export default function RoomsManagement({ children }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
 
-  const handleEdit = (roomid) => {
-    navigate(`/editar-sala/${roomid}`);
-  };
-
   const confirmDelete = async () => {
     await fetch(`http://localhost:3001/salas/${selectedRoomId}`, {
       method: "DELETE",
@@ -114,9 +110,7 @@ export default function RoomsManagement({ children }) {
               >
                 <DropdownMenuItem
                   className="cursor-pointer hover:bg-gray-100"
-                  onClick={() => {
-                    handleEdit(row.original._id);
-                  }}
+                  onClick={() => navigate(`/editar-sala/${row.original._id}`)}
                 >
                   <Edit className="mr-2 h-3 w-4" />
                   Editar
