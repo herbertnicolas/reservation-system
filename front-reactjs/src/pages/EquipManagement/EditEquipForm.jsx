@@ -1,74 +1,28 @@
-import { useState, useEffect } from "react";
-import { Grid2, Typography } from "@mui/material";
-import { PrivateLayout } from "../../components/PrivateLayout/PrivateLayout";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import { Button } from "../../components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { Divider } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+
+import { equipSalaService } from "@/services/equipSalaService";
+import { useEquipEdit } from "@/hooks/use-equip-edit";
+
+import { Grid2, Typography } from "@mui/material";
+import { PrivateLayout } from "@/components/PrivateLayout/PrivateLayout";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
+} from "@/components/ui/select";
 
 export default function EditEquipmentForm() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [rooms, setRooms] = useState([]);
-  const [equipInfo, setEquipInfo] = useState({
-    nome: "",
-    quantidadePorSala: {}
-  });
-  const [formData, setFormData] = useState({
-    salaId: "",
-    quantidade: ""
-  });
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const equipsalaResponse = await fetch("http://localhost:3001/equipsala");
-        const equipsalaData = await equipsalaResponse.json();
-        
-        const equipmentData = equipsalaData.data.filter(
-          equip => equip.equipamento._id === id
-        );
-        
-        if (equipmentData.length === 0) {
-          throw new Error("Equipamento não encontrado");
-        }
-
-        const quantidadePorSala = {};
-        equipmentData.forEach(item => {
-          quantidadePorSala[item.sala._id] = item.quantidade;
-        });
-
-        setEquipInfo({
-          nome: equipmentData[0].equipamento.nome,
-          quantidadePorSala
-        });
-
-        const salasComEquipamento = equipmentData.map(item => item.sala);
-        
-        setRooms(salasComEquipamento);
-        setFormData({
-          salaId: equipmentData[0].sala._id,
-          quantidade: equipmentData[0].quantidade.toString(),
-        });
-
-      } catch (error) {
-        toast.error("Erro ao carregar dados");
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, [id]);
+  const { salas, equipInfo, formData, setFormData } = useEquipEdit(id);
 
   const handleSalaChange = (value) => {
     setFormData({
@@ -81,15 +35,11 @@ export default function EditEquipmentForm() {
     e.preventDefault();
     
     try {
-      const response = await fetch(`http://localhost:3001/equipsala/${formData.salaId}/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantidade: Number(formData.quantidade) }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao atualizar equipamento");
-      }
+      await equipSalaService.updateEquipamento(
+        formData.salaId,
+        id,
+        { quantidade: Number(formData.quantidade) }
+      );
 
       toast.success("Equipamento atualizado com sucesso!");
       navigate("/equipamento-gestao");
@@ -147,7 +97,7 @@ export default function EditEquipmentForm() {
                   <SelectValue placeholder="Selecione uma sala" />
                 </SelectTrigger>
                 <SelectContent>
-                  {rooms.map((room) => (
+                  {salas.map((room) => (
                     <SelectItem key={room._id} value={room._id}>
                       {room.identificador}
                     </SelectItem>

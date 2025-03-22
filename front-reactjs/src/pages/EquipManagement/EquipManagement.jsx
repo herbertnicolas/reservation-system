@@ -1,21 +1,21 @@
-import { Grid2, Typography } from "@mui/material";
-import { PrivateLayout } from "../../components/PrivateLayout/PrivateLayout";
-import { DataTableEquip } from "./components/Table/DataTableEquip";
-import { Button } from "../../components/ui/button";
 import { Edit, MoreVertical, Trash } from "lucide-react";
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { columns } from "./components/Table/Columns";
-import { DeleteConfirmationDialog } from "./components/DeleteConfirmation";
 import { toast } from "react-toastify";
 
+import { DataTableEquip } from "./components/Table/DataTableEquip";
+import { columns } from "./components/Table/Columns";
+import { DeleteConfirmationDialog } from "./components/DeleteConfirmation";
+
+import { Grid2, Typography } from "@mui/material";
+import { PrivateLayout } from "@/components/PrivateLayout/PrivateLayout";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 
 export default function EquipManagement() {
   const navigate = useNavigate();
