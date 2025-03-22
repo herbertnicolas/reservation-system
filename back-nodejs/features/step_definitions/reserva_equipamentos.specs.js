@@ -1,4 +1,4 @@
-const { Given, When, Then, Before } = require('cucumber');
+const { Given, When, Then, Before } = require('@cucumber/cucumber');
 const assert = require('assert');
 const request = require('supertest');
 const app = require('../../src/server').app;

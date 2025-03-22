@@ -8,24 +8,27 @@ const app = require('../../src/server');
 
 let server;
 let mongoServer;
+let dbConnection;
 
-// Configuração do Banco de Dados em Memória
 Before(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const mongoUri = mongoServer.getUri();
-  await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-  server = app.listen(4000); // Porta para testes
+  if (!mongoose.connection.readyState) {
+    mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
+    await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+  }
 });
 
-// Limpeza após cada teste
 After(async () => {
-  await server.close();
   await mongoose.disconnect();
-  await mongoServer.stop();
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
 });
+
 
 // Dados de teste padrão para todos os cenários
 Before({ tags: '@history' }, async () => {
+  await History.deleteMany(); // Limpa o banco antes de inserir os novos dados
   await History.insertMany([
     {
       id: '1',
@@ -46,7 +49,6 @@ Before({ tags: '@history' }, async () => {
 
 // Simulação de autenticação
 Given('eu estou logado como {string} com o login {string} e senha {string}', async function (role, login, senha) {
-  // Simula um token JWT (ajuste conforme sua lógica de autenticação)
   this.authHeader = { Authorization: 'Bearer token_simulado' };
 });
 
