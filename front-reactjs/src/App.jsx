@@ -12,9 +12,10 @@ import "./output.css";
 import StudentOptions from "./pages/StudentOptions/StudentOptions";
 import AdminOptions from "./pages/AdminOptions/AdminOptions";
 
-import EquipManagement from "./pages/EquipManagement/EquipManagement"; // Corrigido
-import AddEquipForm from "./pages/EquipManagement/AddEquipForm"; // Corrigido
-import EditEquipForm from "./pages/EquipManagement/EditEquipForm"; // Corrigido
+/*Equipamentos*/
+import EquipManagement from "./pages/EquipManagement/EquipManagement";
+import AddEquipForm from "./pages/EquipManagement/AddEquipForm";
+import EditEquipForm from "./pages/EquipManagement/EditEquipForm"; 
 
 const App = () => {
   return (
