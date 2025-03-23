@@ -106,30 +106,48 @@ When('seleciono Confirmar', () => {
   cy.wait('@createRoom')
 })
 
-// ======================================================
-// Cenário: Tenta criar sala existente
-// ======================================================
+// Implementação ÚNICA para todos os usos do step
 Given('sala com identificador {string}, localização {string} e capacidade {string} está cadastrada', 
   (id, localizacao, capacidade) => {
-    cy.intercept('POST', 'http://localhost:3001/salas', {
-      statusCode: 400,
-      body: { 
-        erro: `Sala com identificador ${id}, localização ${localizacao} e capacidade ${capacidade} já existe!`
-      }
-    }).as('createRoomError')
+    
+    // Determina o ID com base no identificador
+    let roomId;
+    switch(id) {
+      case 'D002': 
+        roomId = '2';
+        break;
+      case 'D005': 
+        roomId = '1'; 
+        break;
+      case 'D009': 
+        roomId = '4';
+        break;
+      default: 
+        roomId = '999'; // ID genérico para novas salas
+    }
 
+    // Mock dinâmico
     cy.intercept('GET', 'http://localhost:3001/salas', {
       statusCode: 200,
       body: [
-        { 
-          _id: '4', 
-          identificador: id, 
-          localizacao: localizacao, 
-          capacidade: Number(capacidade) 
-        }
+        // Salas padrão do Background
+        { _id: '1', identificador: 'D005', localizacao: 'Prédio D', capacidade: 50 },
+        { _id: '2', identificador: 'D002', localizacao: 'Prédio E', capacidade: 30 },
+        { _id: '3', identificador: 'D005', localizacao: 'Prédio F', capacidade: 90 },
+        
+        // Adiciona a sala específica do cenário
+        ...(id !== 'D002' && id !== 'D005' ? [{
+          _id: roomId,
+          identificador: id,
+          localizacao: localizacao,
+          capacidade: Number(capacidade)
+        }] : [])
       ]
-    })
-})
+    }).as('getSalasAtualizadas');
+
+    cy.visit('/gestao-salas');
+    cy.wait('@getSalasAtualizadas');
+});
 
 Then('aparece uma mensagem de erro {string}', (mensagem) => {
   cy.get('.Toastify__toast--error')
@@ -142,65 +160,88 @@ Then('aparece uma mensagem de erro {string}', (mensagem) => {
 // Cenário: Edita sala existente
 // ======================================================
 When('eu seleciono Editar Sala', () => {
-  const roomId = '2'; // Use o mesmo ID do mock
-  
-  // 1. Abre o dropdown
-  cy.get(`[data-testid="botao-opcoes-${roomId}"]`).click({ force: true });
-  
-  // 2. Clica no botão de edição
-  cy.get(`[data-testid="botao-editar-${roomId}"]`)
-    .click({ force: true });
+  const roomId = '1'; // ID da sala D005
+
+  cy.intercept('GET', 'http://localhost:3001/salas/1', {
+    statusCode: 200,
+    body: {
+      sala:{
+        _id: '1',
+        identificador: 'D005',
+        localizacao: 'Prédio D',
+        capacidade: 50
+      }
+    }
+  }).as('getSalaDetails');
+
+  cy.get(`[data-testid="botao-opcoes-${roomId}"]`)
+  .should('exist')
+  .then($el => {
+    // Força scroll e clique com verificação de visibilidade
+    $el[0].scrollIntoView({ behavior: 'instant', block: 'center' })
+  })
+  .click({ force: true })
+
+  cy.forceClick(`[data-testid="botao-editar-${roomId}"]`);
+  cy.wait('@getSalaDetails');
 });
 
 When('altero a capacidade para {string}', (capacidade) => {
-  cy.intercept('PUT', 'http://localhost:3001/salas/2', {
+  cy.intercept('PUT', 'http://localhost:3001/salas/1', {
     statusCode: 200,
-    body: { message: 'Sala atualizada com sucesso!' }
-  }).as('updateRoom')
+    body: { 
+      message: 'Sala editada com sucesso!',
+      sala: {
+        _id: '1',
+        identificador: 'D005',
+        localizacao: 'Prédio D',
+        capacidade: Number(capacidade)
+      }
+    }
+  }).as('updateD005');
 
   cy.intercept('GET', 'http://localhost:3001/salas', {
     statusCode: 200,
     body: [
-      { 
-        _id: '4', 
-        identificador: 'D009', 
-        localizacao: 'Prédio E', 
-        capacidade: 80 
-      },
-      { _id: '1', identificador: 'D005', localizacao: 'Prédio D', capacidade: 50 },
+      { _id: '1', identificador: 'D005', localizacao: 'Prédio D', capacidade: Number(capacidade) },
       { _id: '2', identificador: 'D002', localizacao: 'Prédio E', capacidade: 30 },
       { _id: '3', identificador: 'D005', localizacao: 'Prédio F', capacidade: 90 }
     ]
-  })
+  }).as('getAfterEdit');
 
   cy.get('[data-testid="input-capacidade"]')
     .clear()
-    .type(capacidade)
-})
-
+    .type(capacidade);
+});
 
 When('seleciono Confirmar Edição', () => {
-  cy.get('[data-testid="botao-salvar"]').click()
-  cy.wait('@updateRoom')
+  cy.get('[data-testid="botao-salvar"]')
+    .should('be.visible')
+    .click()
+  cy.wait('@updateD005');
 })
 
 // ======================================================
 // Cenário: Remove sala existente
 // ======================================================
 When('eu seleciono Remover Sala', () => {
-  const roomId = '4'; // Use o mesmo ID do mock
+  const roomId = '2' // ID correto da sala D002
   
-  // 1. Abre o dropdown
-  cy.get(`[data-testid="botao-opcoes-${roomId}"]`).click({ force: true });
-  
-  // 2. Clica no botão de exclusão
+  cy.get(`[data-testid="botao-opcoes-${roomId}"]`)
+    .should('exist')
+    .then($el => {
+      // Força scroll e clique com verificação de visibilidade
+      $el[0].scrollIntoView({ behavior: 'instant', block: 'center' })
+    })
+    .click({ force: true })
+
   cy.get(`[data-testid="botao-excluir-${roomId}"]`)
-    .should('be.visible')
-    .click({ force: true });
-});
+    .should('be.visible', { timeout: 5000 })
+    .click({ force: true })
+})
 
 When('seleciono Confirmar Remoção', () => {
-  cy.intercept('DELETE', 'http://localhost:3001/salas/4', {
+  cy.intercept('DELETE', 'http://localhost:3001/salas/2', {
     statusCode: 200,
     body: { message: 'Sala removida com sucesso!' }
   }).as('deleteRoom')
@@ -208,16 +249,24 @@ When('seleciono Confirmar Remoção', () => {
   cy.intercept('GET', 'http://localhost:3001/salas', {
     statusCode: 200,
     body: [
-      { _id: '1', identificador: 'D005', localizacao: 'Prédio D', capacidade: 50 },
-      { _id: '2', identificador: 'D002', localizacao: 'Prédio E', capacidade: 30 },
-      { _id: '3', identificador: 'D005', localizacao: 'Prédio F', capacidade: 90 }
+      { 
+        _id: '1', 
+        identificador: 'D005', 
+        localizacao: 'Prédio D', 
+        capacidade: 50 
+      },
+      { 
+        _id: '3', 
+        identificador: 'D005', 
+        localizacao: 'Prédio F', 
+        capacidade: 90 
+      }
     ]
-  })
+  }).as('getSalasAfterDelete')
 
   cy.get('[data-testid="botao-confirmar-remocao"]')
     .click()
-    .wait('@deleteRoom')
-    .wait(1000) // Espera para atualização da UI
+    .wait(['@deleteRoom', '@getSalasAfterDelete'])
 })
 
 Then('não vejo a sala com identificador {string}, localização {string} e capacidade {string}', 

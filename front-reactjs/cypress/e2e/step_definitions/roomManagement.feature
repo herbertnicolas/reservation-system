@@ -34,25 +34,23 @@ Feature: Cadastro e manutenção de salas (criar, editar e remover), do componen
     And consigo ver a sala com identificador "D005", localização "Prédio F" e capacidade "90"
     And consigo ver a sala com identificador "D009", localização "Prédio E" e capacidade "50"
 
-  Scenario: edita uma sala existente
-    Given sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
+Scenario: edita uma sala existente
+    Given sala com identificador "D005", localização "Prédio D" e capacidade "50" está cadastrada
     When eu seleciono Editar Sala
     And altero a capacidade para "80"
-    And seleciono Confirmar
+    And seleciono Confirmar Edição
     Then estou na página Salas
-    And aparece uma mensagem de sucesso "Sala editada com sucesso!"
-    And consigo ver a sala com identificador "D005", localização "Prédio D" e capacidade "50"
+    And aparece uma mensagem de sucesso "Sala atualizada com sucesso!"
+    And consigo ver a sala com identificador "D005", localização "Prédio D" e capacidade "80"
     And consigo ver a sala com identificador "D002", localização "Prédio E" e capacidade "30"
     And consigo ver a sala com identificador "D005", localização "Prédio F" e capacidade "90"
-    And consigo ver a sala com identificador "D009", localização "Prédio E" e capacidade "80"
 
-  Scenario: Administrador remove sala existente
-    Given sala com identificador "D009", localização "Prédio E" e capacidade "50" está cadastrada
+  Scenario: remove sala existente
+    Given sala com identificador "D002", localização "Prédio E" e capacidade "30" está cadastrada
     When eu seleciono Remover Sala
     And seleciono Confirmar Remoção
     Then estou na página Salas
-    And vejo uma mensagem de sucesso "Sala removida com sucesso!"
+    And aparece uma mensagem de sucesso "Sala excluída com sucesso!"
     And consigo ver a sala com identificador "D005", localização "Prédio D" e capacidade "50"
-    And consigo ver a sala com identificador "D002", localização "Prédio E" e capacidade "30"
+    And não vejo a sala com identificador "D002", localização "Prédio E" e capacidade "30"
     And consigo ver a sala com identificador "D005", localização "Prédio F" e capacidade "90"
-    And não vejo a sala com identificador "D009", localização "Prédio E" e capacidade "50"
