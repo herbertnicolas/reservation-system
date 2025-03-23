@@ -1,4 +1,5 @@
 const Room = require("../../models/Salas");
+const EquipSala = require('../../models/EquipSala');
 const validateRoomData = require('../middlewares/roomValidation');
 
 const getRooms = async (req, resp) => {
@@ -104,6 +105,12 @@ const updateRoom = [validateRoomData, async (req, res) => {
 }];
 const deleteRoom = async (req, resp) => {
     try {
+        const equipamentosAssociados = await EquipSala.findOne({ salaId: id });
+        if (equipamentosAssociados) {
+          return resp.status(400).json({
+            message: "Não é possível deletar a sala pois há equipamentos associados a ela."
+          });
+        }
         const { id } = req.params;
         const room = await Room.findByIdAndDelete(id);
         if (!room){

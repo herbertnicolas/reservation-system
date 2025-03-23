@@ -2,6 +2,13 @@
 
 import { Given, When, Then, And } from 'cypress-cucumber-preprocessor/steps'
 
+
+beforeEach(() => {
+  cy.window().then((win) => {
+    win.sessionStorage.clear()
+  })
+  cy.clearCookies()
+})
 // ======================================================
 // Background
 // ======================================================
@@ -135,11 +142,18 @@ Then('aparece uma mensagem de erro {string}', (mensagem) => {
 // Cenário: Edita sala existente
 // ======================================================
 When('eu seleciono Editar Sala', () => {
-  cy.get('[data-testid="botao-editar-4"]').click()
-})
+  const roomId = '2'; // Use o mesmo ID do mock
+  
+  // 1. Abre o dropdown
+  cy.get(`[data-testid="botao-opcoes-${roomId}"]`).click({ force: true });
+  
+  // 2. Clica no botão de edição
+  cy.get(`[data-testid="botao-editar-${roomId}"]`)
+    .click({ force: true });
+});
 
 When('altero a capacidade para {string}', (capacidade) => {
-  cy.intercept('PUT', 'http://localhost:3001/salas/4', {
+  cy.intercept('PUT', 'http://localhost:3001/salas/2', {
     statusCode: 200,
     body: { message: 'Sala atualizada com sucesso!' }
   }).as('updateRoom')
@@ -164,7 +178,8 @@ When('altero a capacidade para {string}', (capacidade) => {
     .type(capacidade)
 })
 
-When('seleciono Confirmar', () => {
+
+When('seleciono Confirmar Edição', () => {
   cy.get('[data-testid="botao-salvar"]').click()
   cy.wait('@updateRoom')
 })
@@ -173,8 +188,16 @@ When('seleciono Confirmar', () => {
 // Cenário: Remove sala existente
 // ======================================================
 When('eu seleciono Remover Sala', () => {
-  cy.get('[data-testid="botao-excluir-4"]').click()
-})
+  const roomId = '4'; // Use o mesmo ID do mock
+  
+  // 1. Abre o dropdown
+  cy.get(`[data-testid="botao-opcoes-${roomId}"]`).click({ force: true });
+  
+  // 2. Clica no botão de exclusão
+  cy.get(`[data-testid="botao-excluir-${roomId}"]`)
+    .should('be.visible')
+    .click({ force: true });
+});
 
 When('seleciono Confirmar Remoção', () => {
   cy.intercept('DELETE', 'http://localhost:3001/salas/4', {

@@ -99,7 +99,8 @@ export default function RoomsManagement({ children }) {
           <>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
+                <Button variant="ghost" className="h-8 w-8 p-0"
+                data-testid={`botao-opcoes-${row.original._id}`}>
                   {/* <span className="sr-only">Open menu</span> */}
                   <MoreVertical className="h-4 w-4" />
                 </Button>
