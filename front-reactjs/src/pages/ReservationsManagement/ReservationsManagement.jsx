@@ -1,4 +1,4 @@
-import React, {use, useEffect, useState} from "react";
+import React, { useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { PrivateLayout } from "../../components/PrivateLayout/PrivateLayout";
@@ -19,11 +19,22 @@ function ReservationsManagement() {
 
   const fetchReservations = async (status = "") => {
     try {
-      const response = await fetch(`/api/reservas${status ? `?status=${status}` : ''}`);
+
+      const endpoint = status 
+      ? `http://localhost:3001/verificarreservas/status?status=${status}`
+      : `http://localhost:3001/verificarreservas`;
+      const response = await fetch(endpoint);
+      if (!responde.ok) {
+        const errorData = await responde.json();
+        throw new Error(errorData.msg || "Erro ao carregar reservas.")
+      }
       const data = await response.json();
-      setReservations(data.data);
+      if (!Array.isArray(data)) {
+        throw new Error("Formato inválido.")
+      }
+      setReservations(data);
     } catch (error) {
-      toast.error('Erro ao carregar reservas');
+      toast.error('Erro ao carregar reservas.');
     }
   };
 
@@ -44,52 +55,55 @@ function ReservationsManagement() {
   // confirmar a reserva
   const handleConfirm = async (id) => {
     try {
-      const response = await fetch(`/api/reservas/${id}`, {
+      const response = await fetch(`http://localhost:3001/verificarreservas/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ statusReserva: 'Confirmada' }),
+        body: JSON.stringify({ statusReserva: 'confirmada' }),
       });
-      const data = await response.json();
+      
       if (response.ok) {
         toast.success("Status da reserva atualizado!");
         fetchReservations(filteredStatus);
-        onClose();
+        handleCloseModal();
       } else {
-        toast.error(data.msg || 'Erro ao atualizar status.');
+        const errorData = await response.json();
+        throw new Error(data.msg || 'Erro ao atualizar status.');
       }
     } catch (error) {
-      toast.error('Erro ao modificar status da reserva.');
+      toast.error(`Erro ao confirmar reserva: ${error.message}`);
     }
   };
 
   // cancelar a reserva
   const handleCancel = async (id) => {
     try {
-      const response = await fetch(`/api/reservas/${id}`, {
+      const response = await fetch(`http://localhost:3001/verificarreservas/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ statusReserva: 'Cancelada' }),
+        body: JSON.stringify({ statusReserva: 'cancelada' }),
       });
-      const data = await response.json();
+
       if (response.ok) {
         toast.success("Status da reserva atualizado com sucesso!");
         fetchReservations(filteredStatus);
-        onClose();
+        handleCloseModal();
       } else {
-        toast.error(data.msg || 'Erro ao atualizar status.');
+        const errorData = await response.json();
+        throw new Error(data.msg || 'Erro ao atualizar status.');
       }
     } catch (error) {
-      toast.error('Erro ao modificar status da reserva.');
+      toast.error(`Erro ao cancelar reserva: ${error.message}`);
     }
   };
 
   // filtro
   const handleApplyFilter = (status) => {
     setFilteredStatus(status);
+    fetchReservations(status);
     setFilterModalOpen(false);
   };
 
