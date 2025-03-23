@@ -34,7 +34,8 @@ export default function ManageOptions() {
             {/* Card Webhooks */}
             <Grid item xs={12} md={6}>
               <Paper 
-                onClick={() => navigate('/reservar-sala')}
+                id="card-recursos"
+                onClick={() => navigate('/gestao-salas')}
                 elevation={2} 
                 sx={{ 
                   borderRadius: '16px',
@@ -64,7 +65,8 @@ export default function ManageOptions() {
             {/* Card Monitoramento */}
             <Grid item xs={12} md={6}>
               <Paper 
-                onClick={() => navigate('/verificar-reservas')}
+                id="card-verificar-reservas"
+                onClick={() => navigate('/gestao-reservas')}
                 elevation={2} 
                 sx={{ 
                   borderRadius: '16px',

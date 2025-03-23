@@ -33,6 +33,7 @@ export default function StudentOptions() {
           <Grid container spacing={6} sx={{ maxWidth: 1200 }}>
             <Grid item xs={12} md={6}>
               <Paper
+                id="card-res-salas"
                 onClick={() => navigate("/reservar-sala")}
                 elevation={2}
                 sx={{
@@ -62,6 +63,7 @@ export default function StudentOptions() {
             {/* Card Webhooks */}
             <Grid item xs={12} md={6}>
               <Paper
+                id="card-res-equipamentos"
                 onClick={() => navigate("/reservar-equipamento")}
                 elevation={2}
                 sx={{
