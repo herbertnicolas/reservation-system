@@ -17,6 +17,10 @@ import CDEquipForm from "./pages/EquipManagement/CDEquipForm";
 import EditEquipForm from "./pages/EquipManagement/EditEquipForm"; 
 import RoomReservation from "./pages/ReservationsManagement/RoomReservation/RoomReservation";
 import EquipmentReservation from "./pages/ReservationsManagement/EquipmentReservation/EquipmentReservation";
+import ReservationsManagement from "./pages/ReservationsManagement/ReservationsManagement";
+/*Historico*/
+import HistoryManagement from "./pages/HistoryManagement/HistoryManagement";
+import SearchHistory from "./pages/HistoryManagement/SearchHistory";
 
 const App = () => {
   return (
@@ -36,6 +40,11 @@ const App = () => {
         <Route path="/equipamento-gestao" element={<EquipManagement />} /> 
         <Route path="/equipamento-cadastro" element={<CDEquipForm />} /> 
         <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> 
+        {/*RESERVAS*/}
+        <Route path="/gestao-reservas" element={<ReservationsManagement />} />
+        {/* HISTORICO */}
+        <Route path="/historico" element={<HistoryManagement />} />
+        <Route path="/historico/buscar" element={<SearchHistory />} />
       </Routes>
       <ToastContainer />
     </Router>

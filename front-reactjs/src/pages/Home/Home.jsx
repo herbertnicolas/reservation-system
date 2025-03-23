@@ -34,6 +34,7 @@ export default function Home() {
             {/* Card Webhooks */}
             <Grid item xs={12} md={6}>
               <Paper 
+                id="card-alunos"
                 onClick={() => navigate('/alunos')}
                 elevation={2} 
                 sx={{ 
@@ -64,6 +65,7 @@ export default function Home() {
             {/* Card Monitoramento */}
             <Grid item xs={12} md={6}>
               <Paper 
+                id="card-administrador"
                 onClick={() => navigate('/administrador')}
                 elevation={2} 
                 sx={{ 
