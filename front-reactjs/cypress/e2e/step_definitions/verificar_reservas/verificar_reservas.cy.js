@@ -1,4 +1,4 @@
-import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor/steps";
+const { Given, When, Then } = require("cypress-cucumber-preprocessor/steps");
 
 // backgroung
 Given("o usuário está na página inicial", () => {
@@ -33,6 +33,7 @@ Then("a tabela contém colunas com as informações das reservas", () => {
   cy.get("table th").should("contain", "Identificador");
   cy.get("table th").should("contain", "Tipo");
   cy.get("table th").should("contain", "Status");
+  cy.get("table th").should("contain", "Editar");
 });
 
 // confirmar ou cancelar reservas
