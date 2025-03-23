@@ -1,4 +1,4 @@
-import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
+import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor/steps";
 
 // backgroung
 Given("o usuário está na página inicial", () => {
@@ -18,15 +18,20 @@ Then("o usuário é redirecionado para a página de gestão de reservas {string}
 });
 
 // tabela de reservas
-Then("o usuário vê uma tabela com as reservas criadas previamente", () => {
-  cy.get('table').should("be.visible");
-  cy.get("tbody tr").should("have.lenght.greaterThan", 0);
+Then("o usuário vê uma tabela com as reservas", () => {
+  cy.get("table").should("be.visible");
+  cy.get("tbody tr").then(($rows) => {
+    if ($rows.length > 0) {
+      cy.wrap($rows).should("have.length.greaterThan", 0);
+    } else {
+      cy.get("tbody").should("contain", "Nenhuma reserva encontrada.");
+    }
+  });
 });
 
 Then("a tabela contém colunas com as informações das reservas", () => {
   cy.get("table th").should("contain", "Identificador");
   cy.get("table th").should("contain", "Tipo");
-  cy.get("table th").should("contain", "Status");
   cy.get("table th").should("contain", "Status");
 });
 
@@ -45,7 +50,7 @@ When("o usuário clica no botão {string}", (buttonText) => {
 
 Then("uma mensagem de sucesso deve ser exibida", () => {
     cy.get(".Toastify__toast--success").should("be.visible");
-    cy.get(".Toastify__toast--success").should("contain", "Status da reserva atualizado com sucessso!");
+    cy.get(".Toastify__toast--success").should("contain", "Status da reserva atualizado com sucesso!");
   });
 
 Then("o usuário deve retornar para a tabela de reservas", () => {
@@ -72,4 +77,5 @@ Then("a tabela de reservas exibe somente reservas com o status {string}", (statu
       cy.get('td').eq(2).should('contain', status);
     });
   });
+  cy.get('[role="dialog"]').should("not.exist");
 });

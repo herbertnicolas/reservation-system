@@ -55,6 +55,7 @@ function ReservationsManagement() {
       if (response.ok) {
         toast.success("Status da reserva atualizado!");
         fetchReservations(filteredStatus);
+        onClose();
       } else {
         toast.error(data.msg || 'Erro ao atualizar status.');
       }
@@ -75,8 +76,9 @@ function ReservationsManagement() {
       });
       const data = await response.json();
       if (response.ok) {
-        toast.success("Status da reserva atualizado com sucessso!");
+        toast.success("Status da reserva atualizado com sucesso!");
         fetchReservations(filteredStatus);
+        onClose();
       } else {
         toast.error(data.msg || 'Erro ao atualizar status.');
       }

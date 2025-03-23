@@ -9,8 +9,8 @@ Feature: Verificar Reservas
           And seleciona a opção Verificar reservas para editar as resevas já criadas
           Then o usuário é redirecionado para a página de gestão de reservas "/gerenciamento-reservas"
 
-     Scenario: Visualizar tabela de reservas feitas
-          Then o usuário vê uma tabela com as reservas criadas previamente
+     Scenario: Visualizar tabela de reservas
+          Then o usuário vê uma tabela com as reservas
           And a tabela contém colunas com as informações das reservas
 
      Scenario: Confirmar reserva com sucesso
