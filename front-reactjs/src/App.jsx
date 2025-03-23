@@ -13,7 +13,7 @@ import StudentOptions from "./pages/StudentOptions/StudentOptions";
 import AdminOptions from "./pages/AdminOptions/AdminOptions";
 /*Equipamentos*/
 import EquipManagement from "./pages/EquipManagement/EquipManagement";
-import AddEquipForm from "./pages/EquipManagement/AddEquipForm";
+import CDEquipForm from "./pages/EquipManagement/CDEquipForm";
 import EditEquipForm from "./pages/EquipManagement/EditEquipForm"; 
 import RoomReservation from "./pages/ReservationsManagement/RoomReservation/RoomReservation";
 import EquipmentReservation from "./pages/ReservationsManagement/EquipmentReservation/EquipmentReservation";
@@ -37,9 +37,9 @@ const App = () => {
         {/* EQUIPAMENTOS */}
         <Route path="/reservar-sala" element={<RoomReservation />} />
         <Route path="/reservar-equipamento" element={<EquipmentReservation />} />
-        <Route path="/equipamento-gestao" element={<EquipManagement />} /> {/* Corrigido */}
-        <Route path="/equipamento-cadastro" element={<AddEquipForm />} /> {/* Corrigido */}
-        <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> {/* Corrigido */}
+        <Route path="/equipamento-gestao" element={<EquipManagement />} /> 
+        <Route path="/equipamento-cadastro" element={<CDEquipForm />} /> 
+        <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> 
         {/*RESERVAS*/}
         <Route path="/gestao-reservas" element={<ReservationsManagement />} />
         {/* HISTORICO */}

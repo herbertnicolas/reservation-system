@@ -84,7 +84,7 @@ export function AppSidebar({ ...props }) {
             url: "/equipamento-gestao",
           },
           {
-            title: "Cadastro de equipamento",
+            title: "Gerenc. de Equipamentos",
             url: "/equipamento-cadastro",
           },
         ],
