@@ -38,7 +38,7 @@ const App = () => {
         <Route path="/equipamento-cadastro" element={<AddEquipForm />} /> {/* Corrigido */}
         <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> {/* Corrigido */}
         {/*RESERVAS*/}
-        <Route path="/gestao-reservas" element={<ReservationsManagement />} />
+        <Route path="/gerenciamento-reservas" element={<ReservationsManagement />} />
       </Routes>
       <ToastContainer />
     </Router>

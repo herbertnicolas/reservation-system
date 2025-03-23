@@ -7,7 +7,6 @@ import { ReservationsTable } from "./components/ReservationsTable/ReservationsTa
 import { FilterReservationModal } from "./components/FilterReservationModal/FilterReservationModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 
 function ReservationsManagement() {
   const navigate = useNavigate();
