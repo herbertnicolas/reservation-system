@@ -95,7 +95,6 @@ const criarReserva = async (req, res) => {
     }
 
     // verifica conflito de datas
-    console.log(recurso);
     if( recurso.tipo === "equipamento"){
       if (recurso.datasReservas.includes(dataReserva)) {
         return res.status(400).json({

@@ -87,7 +87,7 @@ export default function CDEquipForm() {
           }}
         >
           <Grid2 size={12}>
-            <Typography variant="h4">Adicionar Equipamento</Typography>
+            <Typography variant="h4">Cadastrar Equipamento</Typography>
             <Divider />
           </Grid2>
 
