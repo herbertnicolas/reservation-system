@@ -102,7 +102,7 @@ const deleteEquipamento = async (req, res) => {
 
     // Encontra todas as associacoes com as salas
     const equipSalas = await EquipSala.find({ 
-      equipamento: req.params.equipamentoId 
+      equipamentoId: equipamento._id 
     });
 
     if (equipSalas.length > 0) {

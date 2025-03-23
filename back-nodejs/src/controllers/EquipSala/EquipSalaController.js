@@ -77,9 +77,13 @@ const removeEquipamentoFromSala = async (req, res) => {
     }
     
     // verifica se há reservas ativas para esse equipamento nessa sala
-    const reservas = await Reserva.find({tipo: 'equipamento', equipSalaId: equipSala._id, salaId: salaId}) 
+    const hasActiveReservations = await Reserva.findOne({
+      equipSalaId: equipSala._id,
+      status: { $ne: 'cancelada' },
+      dataReserva: { $gte: new Date() }
+    });
 
-    if (reservas.length > 0) {
+    if (hasActiveReservations) {
       return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
     }
     
