@@ -109,6 +109,7 @@ export default function RoomsManagement({ children }) {
                 style={{ backgroundColor: "white" }}
               >
                 <DropdownMenuItem
+                  data-testid={`botao-editar-${row.original._id}`}
                   className="cursor-pointer hover:bg-gray-100"
                   onClick={() => navigate(`/editar-sala/${row.original._id}`)}
                 >
@@ -116,6 +117,7 @@ export default function RoomsManagement({ children }) {
                   Editar
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  data-testid={`botao-excluir-${row.original._id}`}
                   className="cursor-pointer hover:bg-gray-100"
                   onClick={() => {
                     setIsModalOpen(true);

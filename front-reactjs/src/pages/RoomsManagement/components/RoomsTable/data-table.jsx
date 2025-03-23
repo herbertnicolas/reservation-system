@@ -92,6 +92,7 @@ export function DataTable({ columns, data }) {
         
           <Button
             className="bg-black text-white w-full h-10 p-4"
+            data-testid="botao-nova-sala"
             type="primary"
             htmlType="submit"
             block
@@ -102,7 +103,10 @@ export function DataTable({ columns, data }) {
           </Button>
         </Grid>
       </Grid>
-      <div className="m-2 rounded-md border bg-white">
+      <div 
+        className="m-2 rounded-md border bg-white"
+        data-testid="lista-salas"
+      >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -131,7 +135,10 @@ export function DataTable({ columns, data }) {
                   className="hover:bg-gray-50"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell 
+                      key={cell.id}
+                      data-testid={`celula-${cell.column.id}-${row.id}`}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

@@ -125,6 +125,7 @@ export default function EditRoom() {
             </Button>
             <Button
               className="bg-black text-white w-fit p-4 h-10"
+              data-testid="botao-salvar"
               onClick={handleUpdate}
             >
               Salvar Alterações

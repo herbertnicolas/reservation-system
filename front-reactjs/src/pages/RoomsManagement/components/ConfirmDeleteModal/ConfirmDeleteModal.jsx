@@ -25,6 +25,7 @@ export function ConfirmDeleteModal({ isOpen, onClose, onConfirm }) {
               Cancelar
             </Button>
             <Button
+              data-testid="botao-confirmar-remocao"
               style={{
                 backgroundColor: "#000",
                 color: "#fff",
