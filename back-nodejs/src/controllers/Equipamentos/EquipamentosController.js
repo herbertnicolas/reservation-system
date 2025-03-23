@@ -1,4 +1,6 @@
 const Equipamento = require('../../models/Equipamento');
+const EquipSala = require('../../models/EquipSala');
+const Reserva = require('../../models/Reserva');
 
 const getEquipamentos = async (req, res) => {
   try {
@@ -88,9 +90,60 @@ const criarEquipamento = async (req, res) => {
   }
 };
 
+const deleteEquipamento = async (req, res) => {
+  try {
+    const equipamento = await Equipamento.findById(req.params.equipamentoId);
+
+    if (!equipamento) {
+      return res.status(404).json({
+        msg: 'Equipamento não encontrado',
+      });
+    }
+
+    // Encontra todas as associacoes com as salas
+    const equipSalas = await EquipSala.find({ 
+      equipamento: req.params.equipamentoId 
+    });
+
+    if (equipSalas.length > 0) {
+      // Verifica se tem alguma com reserva ativa
+      const hasActiveReservations = await Reserva.findOne({
+        equipSalaId: { $in: equipSalas.map(es => es._id) },
+        status: { $ne: 'cancelada' },
+        dataReserva: { $gte: new Date() }
+      });
+
+      if (hasActiveReservations) {
+        return res.status(400).json({
+          msg: 'Não é possível remover um equipamento com reservas ativas',
+        });
+      }
+
+      return res.status(400).json({
+        msg: 'Não é possível remover um equipamento que está atribuído a uma sala',
+      });
+    }
+
+    // Se nao tem associacoes, pode deletar
+    await Equipamento.findByIdAndDelete(req.params.equipamentoId);
+
+    return res.status(200).json({
+      msg: 'Equipamento removido com sucesso',
+      data: equipamento,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      msg: 'Erro ao remover equipamento',
+      error: err.message,
+    });
+  }
+};
+
+
 module.exports = {
   getEquipamentos,
   getEquipamento,
   criarEquipamento,
-  getEquipamentoByName
+  getEquipamentoByName,
+  deleteEquipamento
 };
