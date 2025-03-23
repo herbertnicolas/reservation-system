@@ -22,15 +22,27 @@ export default function RoomsManagement({ children }) {
   const [selectedRoomId, setSelectedRoomId] = useState(null);
 
   const confirmDelete = async () => {
-    await fetch(`http://localhost:3001/salas/${selectedRoomId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    });
-    setIsModalOpen(false);
-    // Atualize a lista de usuários aqui
-    toast.success("Sala excluída com sucesso!");
+    try {
+      const response = await fetch(`http://localhost:3001/salas/${selectedRoomId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || `Erro ${response.status}: ${response.statusText}`);
+      }
+  
+      setIsModalOpen(false);
+      fetchRooms();
+      toast.success("Sala excluída com sucesso!");
+    } catch (error) {
+      toast.error(error.message.replace("Error: ", "")); // Remove prefixo 'Error:'
+      setIsModalOpen(false);
+    }
   };
-
+  
   const [roomsData, setRoomsData] = useState([]);
 
   async function getRooms() {

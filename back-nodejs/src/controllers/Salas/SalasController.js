@@ -104,23 +104,28 @@ const updateRoom = [validateRoomData, async (req, res) => {
   }
 }];
 const deleteRoom = async (req, resp) => {
-    try {
-        const equipamentosAssociados = await EquipSala.findOne({ salaId: id });
-        if (equipamentosAssociados) {
+  try {
+      const { id: salaId } = req.params; // Renomeia para evitar conflito
+
+      const equipamentosAssociados = await EquipSala.findOne({ salaId });
+      if (equipamentosAssociados) {
           return resp.status(400).json({
-            message: "Não é possível deletar a sala pois há equipamentos associados a ela."
+              message: "Não é possível deletar a sala pois há equipamentos associados a ela."
           });
-        }
-        const { id } = req.params;
-        const room = await Room.findByIdAndDelete(id);
-        if (!room){
-            return resp.status(404).json({message: `Sala com identificador ${id} não encontrada`});
-        }
-        resp.status(200).json({message: "Sala deletada com sucesso!"});
-    
-    } catch (error) {
-        resp.status(500).json({message: error.message});
-    }
+      }
+
+      const room = await Room.findByIdAndDelete(salaId);
+      if (!room) {
+          return resp.status(404).json({ 
+              message: `Sala com ID ${salaId} não encontrada` 
+          });
+      }
+      
+      resp.status(200).json({ message: "Sala deletada com sucesso!" });
+  
+  } catch (error) {
+      resp.status(500).json({ message: error.message });
+  }
 }
 module.exports = {
     getRooms,
