@@ -35,7 +35,7 @@ export default function EquipManagement() {
       await equipSalaService.removeEquipamento(selectedSalaId, selectedEquipId);
       
       setIsModalOpen(false);
-      toast.success("Equipamento removido com sucesso!");
+      toast.success("Equipamento removido da sala com sucesso!");
       fetchEquipments();
     } catch (error) {
       toast.error(error.message);

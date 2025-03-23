@@ -21,7 +21,7 @@ export function BaseEquipDelete({ equipamentos, onEquipamentoDeleted }) {
   const handleDelete = async () => {
     try {
       await equipSalaService.deleteEquipamento(selectedEquipId);
-      toast.success('Equipamento removido com sucesso');
+      toast.success('Equipamento deletado com sucesso');
       onEquipamentoDeleted();
       setIsDeleteModalOpen(false);
       setSelectedEquipId(null);

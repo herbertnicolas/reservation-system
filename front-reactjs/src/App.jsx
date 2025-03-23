@@ -33,9 +33,9 @@ const App = () => {
         {/* EQUIPAMENTOS */}
         <Route path="/reservar-sala" element={<RoomReservation />} />
         <Route path="/reservar-equipamento" element={<EquipmentReservation />} />
-        <Route path="/equipamento-gestao" element={<EquipManagement />} /> {/* Corrigido */}
-        <Route path="/equipamento-cadastro" element={<CDEquipForm />} /> {/* Corrigido */}
-        <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> {/* Corrigido */}
+        <Route path="/equipamento-gestao" element={<EquipManagement />} /> 
+        <Route path="/equipamento-cadastro" element={<CDEquipForm />} /> 
+        <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> 
       </Routes>
       <ToastContainer />
     </Router>
