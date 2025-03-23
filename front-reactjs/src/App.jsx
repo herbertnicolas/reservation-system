@@ -20,7 +20,7 @@ import EquipmentReservation from "./pages/ReservationsManagement/EquipmentReserv
 import ReservationsManagement from "./pages/ReservationsManagement/ReservationsManagement";
 /*Historico*/
 import HistoryManagement from "./pages/HistoryManagement/HistoryManagement";
-import SearchHistoryPage from "./pages/HistoryManagement/SearchHistory";
+import SearchHistory from "./pages/HistoryManagement/SearchHistory";
 
 const App = () => {
   return (

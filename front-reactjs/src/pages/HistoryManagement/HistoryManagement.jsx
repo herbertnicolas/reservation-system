@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import SearchHistory from './SearchHistory';
 
 const HistoryManagement = () => {
   const [history, setHistory] = useState([]);
