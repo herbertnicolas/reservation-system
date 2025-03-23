@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import { equipSalaService } from "@/services/equipSalaService";
+
 import { DataTableEquip } from "./components/Table/DataTableEquip";
 import { columns } from "./components/Table/Columns";
 import { DeleteConfirmationDialog } from "./components/DeleteConfirmation";
@@ -30,18 +32,8 @@ export default function EquipManagement() {
 
   const confirmDelete = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3001/equipsala/${selectedSalaId}/${selectedEquipId}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erro ao deletar equipamento");
-      }
-
+      await equipSalaService.removeEquipamento(selectedSalaId, selectedEquipId);
+      
       setIsModalOpen(false);
       toast.success("Equipamento removido com sucesso!");
       fetchEquipments();
@@ -50,19 +42,14 @@ export default function EquipManagement() {
     }
   };
 
-  async function getEquipments() {
-    const response = await fetch("http://localhost:3001/equipsala");
-    return response.json();
-  }
-
-  async function fetchEquipments() {
+  const fetchEquipments = async () => {
     try {
-      const data = await getEquipments();
-      setEquipmentData(data.data);
+      const response = await equipSalaService.getAllEquipSala();
+      setEquipmentData(response.data);
     } catch (error) {
-      toast.error("Erro ao carregar equipamentos");
+      toast.error(error.message);
     }
-  }
+  };
 
   useEffect(() => {
     fetchEquipments();
