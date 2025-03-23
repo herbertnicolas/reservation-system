@@ -7,7 +7,7 @@ import { equipSalaService } from "@/services/equipSalaService";
 
 import { DataTableEquip } from "./components/Table/DataTableEquip";
 import { columns } from "./components/Table/Columns";
-import { DeleteConfirmationDialog } from "./components/DeleteConfirmation";
+import { DeleteConfirmation } from "../../components/DeleteConfirmation";
 
 import { Grid2, Typography } from "@mui/material";
 import { PrivateLayout } from "@/components/PrivateLayout/PrivateLayout";
@@ -21,7 +21,7 @@ import {
 
 export default function EquipManagement() {
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedEquipId, setSelectedEquipId] = useState(null);
   const [selectedSalaId, setSelectedSalaId] = useState(null);
   const [equipmentData, setEquipmentData] = useState([]);
@@ -30,11 +30,11 @@ export default function EquipManagement() {
     navigate(`/equipamento-edicao/${equipId}`);
   };
 
-  const confirmDelete = async () => {
+  const handleDelete = async () => {
     try {
       await equipSalaService.removeEquipamento(selectedSalaId, selectedEquipId);
       
-      setIsModalOpen(false);
+      setIsDeleteModalOpen(false);
       toast.success("Equipamento removido da sala com sucesso!");
       fetchEquipments();
     } catch (error) {
@@ -79,7 +79,7 @@ export default function EquipManagement() {
             onClick={() => {
               setSelectedEquipId(equiproom.equipamento._id);
               setSelectedSalaId(equiproom.sala._id);
-              setIsModalOpen(true);
+              setIsDeleteModalOpen(true);
             }}
           >
             <Trash className="mr-2 h-4 w-4" style={{ color: "red" }} />
@@ -106,12 +106,14 @@ export default function EquipManagement() {
           </Grid2>
         </Grid2>
       </PrivateLayout>
-      {isModalOpen && (
-        <DeleteConfirmationDialog
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onConfirm={confirmDelete}
-        />
+      {isDeleteModalOpen && (
+        <DeleteConfirmation
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Deseja realmente remover este equipamento da sala?"
+        description="O equipamento continuará disponível para ser adicionado novamente a esta ou outras salas."
+    />
       )}
     </>
   );

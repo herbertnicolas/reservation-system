@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Grid2 } from "@mui/material";
 import { Button } from "@/components/ui/button";
-import { DeleteConfirmationDialog } from './DeleteConfirmation';
+import { DeleteConfirmation } from '../../../components/DeleteConfirmation';
 
 export function BaseEquipDelete({ equipamentos, onEquipamentoDeleted }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -75,11 +75,12 @@ export function BaseEquipDelete({ equipamentos, onEquipamentoDeleted }) {
         Remover Equipamento
       </Button>
 
-      <DeleteConfirmationDialog
+      <DeleteConfirmation
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDelete}
-        message="Deseja realmente remover este equipamento da base de dados?"
+        title="Deseja realmente remover este equipamento da base de dados?"
+        description="Esta ação não poderá ser desfeita e o equipamento não estará mais disponível para ser adicionado às salas."
       />
     </Grid2>
   );
