@@ -1,5 +1,8 @@
 const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
-const { expect } = require('chai');
+let chai;
+(async ()  => {
+  chai = await import('chai');
+})();
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
