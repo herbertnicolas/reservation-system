@@ -97,6 +97,7 @@ export default function CreateRoom() {
             >
               <Label htmlFor="nome_usuario">Identificador sala</Label>
               <Input
+                data-testid="input-identificador"
                 type="string"
                 id="identificador-sala"
                 value={identificador}
@@ -114,6 +115,7 @@ export default function CreateRoom() {
             >
               <Label htmlFor="localizacao">Localização</Label>
               <Input
+                data-testid="input-localizacao"
                 type="string"
                 id="localizacao"
                 placeholder="Insira a localização"
@@ -130,6 +132,7 @@ export default function CreateRoom() {
             >
               <Label htmlFor="capacidade">Capacidade</Label>
               <Input
+                data-testid="input-capacidade"
                 type="number"
                 id="capacidade"
                 placeholder="Insira a capacidade"
@@ -158,6 +161,7 @@ export default function CreateRoom() {
             </Button>
             <Button
               className="bg-black text-white border-black w-fit p-4 h-10"
+              data-testid="botao-confirmar"
               onClick={handleRegister}
               htmlType="submit"
               block

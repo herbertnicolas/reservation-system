@@ -106,6 +106,7 @@ export default function EditRoom() {
             <Grid item xs={4} className="grid w-full max-w-sm items-center gap-1.5">
               <Label>Capacidade</Label>
               <Input
+                data-testid="input-capacidade"
                 type="number"
                 id="capacidade"
                 value={roomData.capacidade}
@@ -125,6 +126,7 @@ export default function EditRoom() {
             </Button>
             <Button
               className="bg-black text-white w-fit p-4 h-10"
+              data-testid="botao-salvar"
               onClick={handleUpdate}
             >
               Salvar Alterações
