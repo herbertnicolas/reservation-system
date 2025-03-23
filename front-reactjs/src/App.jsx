@@ -17,6 +17,7 @@ import AddEquipForm from "./pages/EquipManagement/AddEquipForm";
 import EditEquipForm from "./pages/EquipManagement/EditEquipForm"; 
 import RoomReservation from "./pages/ReservationsManagement/RoomReservation/RoomReservation";
 import EquipmentReservation from "./pages/ReservationsManagement/EquipmentReservation/EquipmentReservation";
+import ReservationsManagement from "./pages/ReservationsManagement/ReservationsManagement";
 
 const App = () => {
   return (
@@ -36,6 +37,8 @@ const App = () => {
         <Route path="/equipamento-gestao" element={<EquipManagement />} /> {/* Corrigido */}
         <Route path="/equipamento-cadastro" element={<AddEquipForm />} /> {/* Corrigido */}
         <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> {/* Corrigido */}
+        {/*RESERVAS*/}
+        <Route path="/gestao-reservas" element={<ReservationsManagement />} />
       </Routes>
       <ToastContainer />
     </Router>
