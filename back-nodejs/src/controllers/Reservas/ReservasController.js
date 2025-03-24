@@ -81,7 +81,7 @@ const criarReserva = async (req, res) => {
       return res.status(404).json({
         msg:
           tipo === "sala"
-            ? "Salas não encontrada"
+            ? "Sala não encontrada"
             : "Equipamento não encontrado nesta sala",
       });
     }
@@ -95,8 +95,7 @@ const criarReserva = async (req, res) => {
     }
 
     // verifica conflito de datas
-    console.log(recurso);
-    if( recurso.tipo === "equipamento"){
+    if (tipo === "equipamento") {
       if (recurso.datasReservas.includes(dataReserva)) {
         return res.status(400).json({
           msg: "Reserva indisponível para esta data",
@@ -115,16 +114,18 @@ const criarReserva = async (req, res) => {
       }),
     });
 
-    if (recurso.tipo === "equipamento") recurso.datasReservas.push(dataReserva);
+    if (tipo === "equipamento") {
+      recurso.datasReservas.push(dataReserva);
+    }
     await Promise.all([reserva.save(), recurso.save()]);
 
     return res.status(201).json({
-      msg: `Reserva de ${tipo} criada com sucesso`,
+      msg: `Solicitação de reserva de ${tipo} criada com sucesso`,
       data: reserva,
     });
   } catch (err) {
     return res.status(500).json({
-      msg: "Erro ao criar reserva",
+      msg: "Erro ao criar solicitação de reserva",
       error: err.message,
     });
   }
@@ -189,7 +190,7 @@ const removerReserva = async (req, res) => {
     const reserva = await Reserva.findById(reservaId);
     if (!reserva) {
       return res.status(404).json({
-        msg: "Reserva não encontrada",
+        msg: "Solicitação de reserva não encontrada",
       });
     }
 
@@ -217,7 +218,7 @@ const removerReserva = async (req, res) => {
     await Promise.all([recurso.save(), Reserva.findByIdAndDelete(reservaId)]);
 
     return res.status(200).json({
-      msg: "Reserva removida com sucesso",
+      msg: "Solicitação de reserva removida com sucesso",
       data: null,
     });
   } catch (err) {
