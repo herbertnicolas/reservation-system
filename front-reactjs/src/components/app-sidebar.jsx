@@ -108,7 +108,7 @@ export function AppSidebar({ ...props }) {
           },
           {
             title: "Gerenc. de Reservas",
-            url: "/gestao-reservas",
+            url: "/gerenciamento-reservas",
           },
         ],
       },

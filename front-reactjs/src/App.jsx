@@ -21,7 +21,7 @@ import ReservationsManagement from "./pages/ReservationsManagement/ReservationsM
 /*Historico*/
 import HistoryManagement from "./pages/HistoryManagement/HistoryManagement";
 import SearchHistory from "./pages/HistoryManagement/SearchHistory";
-import ResourceOptions from "./pages/ResourcesOptions/ResourcesOptions";
+import ResourcesOptions from "./pages/ResourcesOptions/ResourcesOptions";
 
 const App = () => {
   return (
@@ -36,17 +36,17 @@ const App = () => {
         <Route path="/sala-cadastro" element={<CreateRoom />} />
         <Route path="/editar-sala/:id" element={<EditRoom />} />
         {/* EQUIPAMENTOS */}
-        <Route path="/reservar-sala" element={<RoomReservation />} />
-        <Route path="/reservar-equipamento" element={<EquipmentReservation />} />
         <Route path="/equipamento-gestao" element={<EquipManagement />} /> 
         <Route path="/equipamento-cadastro" element={<CDEquipForm />} /> 
         <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> 
         {/*RESERVAS*/}
+        <Route path="/reservar-sala" element={<RoomReservation />} />
+        <Route path="/reservar-equipamento" element={<EquipmentReservation />} />
         <Route path="/gerenciamento-reservas" element={<ReservationsManagement />} />
         {/* HISTORICO */}
         <Route path="/historico" element={<HistoryManagement />} />
         <Route path="/historico/buscar" element={<SearchHistory />} />
-        <Route path="/opcoes-recurso" element={<ResourceOptions />} />
+        <Route path="/opcoes-recurso" element={<ResourcesOptions />} />
       </Routes>
       <ToastContainer />
     </Router>
