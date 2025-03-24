@@ -21,6 +21,7 @@ import ReservationsManagement from "./pages/ReservationsManagement/ReservationsM
 /*Historico*/
 import HistoryManagement from "./pages/HistoryManagement/HistoryManagement";
 import SearchHistory from "./pages/HistoryManagement/SearchHistory";
+import ResourceOptions from "./pages/ResourcesOptions/ResourcesOptions";
 
 const App = () => {
   return (
@@ -45,6 +46,7 @@ const App = () => {
         {/* HISTORICO */}
         <Route path="/historico" element={<HistoryManagement />} />
         <Route path="/historico/buscar" element={<SearchHistory />} />
+        <Route path="/opcoes-recurso" element={<ResourceOptions />} />
       </Routes>
       <ToastContainer />
     </Router>

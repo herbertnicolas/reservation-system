@@ -47,6 +47,7 @@ export default function EquipmentReservation({ children }) {
       fetchEquipments();
     } catch (error) {
       toast.error(`${error.message}`);
+      setIsModalOpen(false);
     }
   };
 
