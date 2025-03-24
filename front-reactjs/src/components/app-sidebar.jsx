@@ -82,7 +82,7 @@ export function AppSidebar({ ...props }) {
         icon: Monitor,
         items: [
           {
-            title: "Equipamentos de Sala",
+            title: "Lista de Equipamentos",
             url: "/equipamento-gestao",
           },
           {

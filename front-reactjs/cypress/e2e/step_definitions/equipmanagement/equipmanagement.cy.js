@@ -1,4 +1,4 @@
-const { Before, Given, When, Then } = require("cypress-cucumber-preprocessor/steps");
+const { Given, When, Then } = require("cypress-cucumber-preprocessor/steps");
 const API_URL = 'http://localhost:3001'; 
 
 Given("que eu estou na página de Gestão de Equipamentos", () => {
@@ -117,6 +117,10 @@ When("eu confirmo a remoção selecionando {string}",
     });
 });
 
+When("eu seleciono a opção de ordenar por salas", () => {
+  cy.get('th').contains('Sala').click();
+});
+
 Then("o sistema aceita a operação retornando a mensagem {string}", (msg) => {
     cy.get('.Toastify__toast--success', { timeout: 10000 }).should('contain', msg);
 });
@@ -130,13 +134,12 @@ Then("eu sou redirecionado para a página de Gestão de Equipamentos", () => {
     cy.url().should('include', 'equipamento-gestao');
 });
 
-Then("eu permaneço na página de {string}", (page) => {
-    if (page === "Gestão de Equipamentos") {
-        cy.wait('@getEquipamentos');
-        cy.url().should('include', 'equipamento-gestao');
-    } else {
-        cy.url().should('include', 'equipamento-cadastro');
-    }
+Then("eu permaneço na página de Gestão de Equipamentos", () => {
+    cy.url().should('include', 'equipamento-gestao');
+});
+
+Then("eu permaneço na página de Cadastro de Equipamentos", () => {
+    cy.url().should('include', 'equipamento-cadastro');
 });
 
 Then("eu posso ver o equipamento {string} da sala {string} com quantidade {string}", 
@@ -158,13 +161,15 @@ Then("o equipamento {string} não aparece na lista da sala {string}",
         .should('not.contain', equipamento);
 });
 
-// Then("o equipamento {string} não é adicionado à sala {string}", 
-//     (equipamento, sala) => {
-//     cy.visit(`http://localhost:5173/equipamento-gestao`);
+Then("eu vejo os equipamentos seguindo a ordem salas", () => {
 
-//     cy.get('.w-1\\/3 > .flex').click().type(sala);
-        
-//     cy.get('table tbody tr:first')
-//       .should('not.contain', equipamento);
-// });
+  cy.get('tbody tr td:first-child').then($cells => {
+      const salas = [...$cells].map(cell => cell.textContent);
+      const sortedSalas = [...salas].sort();
+
+      salas.forEach((sala, index) => {
+            cy.wrap(sala).should('eq', sortedSalas[index]);
+      });
+  });
+});
 
