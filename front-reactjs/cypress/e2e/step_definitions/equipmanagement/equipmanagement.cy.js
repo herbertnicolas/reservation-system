@@ -1,4 +1,4 @@
-const { Before, Given, When, Then } = require("cypress-cucumber-preprocessor/steps");
+const { Given, When, Then } = require("cypress-cucumber-preprocessor/steps");
 const API_URL = 'http://localhost:3001'; 
 
 Given("que eu estou na página de Gestão de Equipamentos", () => {
