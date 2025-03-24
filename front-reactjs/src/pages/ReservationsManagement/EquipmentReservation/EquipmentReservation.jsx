@@ -13,32 +13,40 @@ import "./styles.css";
 export default function EquipmentReservation({ children }) {
   let navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRoomId, setSelectedRoomId] = useState(null);
+  const [selectedEquipment, setSelectedEquipment] = useState({
+    salaId: "",
+    equipamentoId: "",
+    dataReserva: "",
+  });
   const [unavailableDates, setUnavailableDates] = useState([]);
-
-  // const handleEdit = (roomid) => {
-  //   navigate(`/editar-sala/${roomid}`);
-  // };
 
   const confirmReservation = async (selectedDate) => {
     try {
-      console.log("ID da sala selecionada:", selectedRoomId);
       const formattedDate = formatDateToBr(selectedDate || new Date());
-
-      await fetch(`http://localhost:3001/reservas`, {
+  
+      const response = await fetch(`http://localhost:3001/reservas`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          salaId: selectedRoomId,
+          salaId: selectedEquipment.salaId,
+          equipamentoId: selectedEquipment.equipamentoId,
           dataReserva: formattedDate,
-          tipo: "sala",
+          tipo: "equipamento",
         }),
       });
+  
+      // Verificar se a resposta foi bem-sucedida
+      if (response.status === 400) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || "Erro ao fazer a reserva");
+      }
+  
       setIsModalOpen(false);
-      // Atualize a lista de usuários aqui
       toast.success("Solicitação de reserva enviada com sucesso!");
+      // Recarregar os dados após uma reserva bem-sucedida
+      fetchEquipments();
     } catch (error) {
-      toast.error(`Erro ao reservar sala: ${error.message}`);
+      toast.error(`${error.message}`);
     }
   };
 
@@ -46,7 +54,7 @@ export default function EquipmentReservation({ children }) {
 
   async function getEquipments() {
     try {
-      const response = await fetch(`http://localhost:3001/equipsala/67bbd23870a886a6964568e5`);
+      const response = await fetch(`http://localhost:3001/equipsala`);
       const result = await response.json();
       // Extrair o array de dados da resposta
       return result.data || [];
@@ -72,7 +80,6 @@ export default function EquipmentReservation({ children }) {
     return `${day}/${month}/${year}`;
   };
 
-  // Buscar as datas em que a sala já está reservada
   const getUnavailableDates = async (equipmentId) => {
     try {
       const response = await fetch(`http://localhost:3001/reservas`);
@@ -102,22 +109,21 @@ export default function EquipmentReservation({ children }) {
 
   const columns = [
     {
-      accessorKey: "salaId",
+      accessorKey: "sala.identificador",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            SALA
+            SALA ALOCADO
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
     },
     {
-      //TROCAR DEPOIS PARA equipmentoId!!!
-      accessorKey: "equipamento._id",
+      accessorKey: "equipamento.nome",
       header: ({ column }) => {
         return (
           <Button
@@ -152,7 +158,7 @@ export default function EquipmentReservation({ children }) {
             <Button
               variant="outline"
               onClick={() => {
-                setSelectedRoomId(row.original._id);
+                setSelectedEquipment({ equipamentoId: row.original.equipamento._id, salaId: row.original.sala._id });
                 getUnavailableDates(row.original._id);
                 setIsModalOpen(true);
               }}
@@ -173,7 +179,7 @@ export default function EquipmentReservation({ children }) {
           className="grid grid-rows-1 flex-grow p-4 w-auto h-fit mx-2"
         >
           <Grid id="main" item xs={12} className="p-4">
-            <Typography variant="h4">Reservar sala</Typography>
+            <Typography variant="h4">Reservar equipamento</Typography>
             {/* {children} */}
           </Grid>
           <Grid item xs={6} className="p-4">
@@ -183,10 +189,11 @@ export default function EquipmentReservation({ children }) {
       </PrivateLayout>
       {isModalOpen && (
         <ConfirmReservationModal
+          id="confirm-reservation-modal"
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onConfirm={confirmReservation}
-          selectedRoomId={selectedRoomId}
+          selectedEquipment={selectedEquipment}
           unavailableDates={unavailableDates}
         />
       )}

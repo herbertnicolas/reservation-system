@@ -13,6 +13,28 @@ When("seleciona a opção Salas para reservar uma sala", function () {
   cy.get("#card-res-salas").click();
 });
 
+When("o usuário seleciona o dia {string} do mês atual", (day) => {
+  // Simular uma resposta de sucesso para a reserva
+  cy.intercept("POST", "http://localhost:3001/reservas", {
+    statusCode: 200,
+    body: { msg: "Reserva realizada com sucesso" }
+  }).as("reservaSucesso");
+  
+  // Seletor para encontrar o botão do dia no calendário
+  // O calendário da biblioteca normalmente renderiza os dias como botões
+  cy.get('[role="dialog"] [role="grid"] button')
+    .filter(`:not([disabled])`)
+    .contains(new RegExp(`^${day}$`))
+    .click();
+  
+  // Logs para depuração
+  cy.log(`Selecionado o dia ${day} do mês atual`);
+});
+
+When("seleciona o botão {string}", (button) => {
+  cy.get("button").contains(button).click();
+});
+
 Then("o usuário deve ser redirecionado para a página de reserva de sala {string}", function (endpoint) {
   cy.url().should("include", endpoint);
 });

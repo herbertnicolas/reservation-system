@@ -82,5 +82,21 @@ export const equipSalaService = {
     }
 
     return responseData;
-  }
+  },
+
+  async deleteEquipamento(equipId) {
+    const response = await fetch(`${API_URL}/equipamentos/${equipId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(responseData.msg);
+    }
+
+    return responseData;
+  },
+
 };

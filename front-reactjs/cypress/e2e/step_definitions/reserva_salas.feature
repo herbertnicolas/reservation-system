@@ -16,14 +16,14 @@ Feature: Reserva de Salas
      Scenario: Reservar uma sala com sucesso
           When o usuário seleciona o botão "Reservar" de uma sala
           Then um calendário deve ser exibido
-          When o usuário seleciona a data futura "22/01/2026" 
-          And clica no botão "Confirmar"
+          When o usuário seleciona o dia "24" do mês atual 
+          And seleciona o botão "Confirmar"
           Then uma mensagem de sucesso deve ser exibida
           And o usuário deve retornar para a tabela de salas
 
      Scenario: Cancelar o ato de reserva de uma sala
-          When o usuário clica no botão "Reservar" de uma sala
+          When o usuário seleciona o botão "Reservar" de uma sala
           Then um calendário deve ser exibido
-          When o usuário clica no botão "Cancelar"
+          When seleciona o botão "Cancelar"
           Then o modal deve ser fechado
           And o usuário deve retornar para a tabela de salas

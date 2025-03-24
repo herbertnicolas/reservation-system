@@ -82,7 +82,7 @@ export function DataTable({ columns, data }) {
       >
         <Grid item className="w-1/3">
           <Input
-            placeholder="Pesquisar salas..."
+            placeholder="Pesquisar equipamentos..."
             value={filterValue}
             onChange={handleFilterChange}
             className="max-w-sm bg-white"

@@ -29,7 +29,7 @@ export default function StudentOptions() {
               O que deseja reservar?
             </Typography>
           </Grid>
-          {/* Card Monitoramento */}
+          {/* Card Salas */}
           <Grid container spacing={6} sx={{ maxWidth: 1200 }}>
             <Grid item xs={12} md={6}>
               <Paper
@@ -60,7 +60,7 @@ export default function StudentOptions() {
                 </Typography>
               </Paper>
             </Grid>
-            {/* Card Webhooks */}
+            {/* Card Equipamentos */}
             <Grid item xs={12} md={6}>
               <Paper
                 id="card-res-equipamentos"

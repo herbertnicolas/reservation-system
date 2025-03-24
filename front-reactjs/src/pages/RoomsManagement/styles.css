@@ -7,3 +7,41 @@
     flex: 1; /* Faz com que o conteúdo principal ocupe o espaço restante */
     padding: 16px; /* Adicione um padding para dar espaço ao conteúdo */
 }
+
+/* Garante visibilidade total dos botões */
+[data-testid^="botao-opcoes-"] {
+  position: static !important;
+  overflow: visible !important;
+  z-index: 9999 !important;
+}
+
+.dropdown-menu-content {
+  position: absolute !important;
+  transform: translate(0, 0) !important;
+  overflow: visible !important;
+  will-change: transform !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* styles.css - Correções para componentes Radix */
+div[data-radix-popper-content-wrapper] {
+  overflow: visible !important;
+  z-index: 99999 !important;
+  position: relative !important;
+}
+
+div[role="menu"] {
+  transform: none !important;
+  overflow: visible !important;
+  position: absolute !important;
+  top: auto !important;
+  left: auto !important;
+  will-change: auto !important;
+}
+
+/* Neutraliza overflow em pais da tabela */
+[data-testid="lista-salas"] {
+  overflow: visible !important;
+  position: static !important;
+}
