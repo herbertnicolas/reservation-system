@@ -77,7 +77,7 @@ export function DataTableEquip({ columns, data }) {
         container
         className="flex items-center py-4 p-2 w-full justify-between"
       >
-        <Grid2 item className="w-1/3">
+        <Grid2 className="w-1/3">
           <Input
             placeholder="Inserir valor do parâmetro de busca..."
             value={filterValue}

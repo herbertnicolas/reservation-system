@@ -77,11 +77,7 @@ const removeEquipamentoFromSala = async (req, res) => {
     }
     
     // verifica se há reservas ativas para esse equipamento nessa sala
-    const hasActiveReservations = await Reserva.findOne({
-      equipSalaId: equipSala._id,
-      status: { $ne: 'cancelada' },
-      dataReserva: { $gte: new Date() }
-    });
+    const hasActiveReservations = await equipHasActiveReservations(equipSala._id);
 
     if (hasActiveReservations) {
       return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
@@ -127,11 +123,7 @@ const updateEquipamentoInSala = async (req, res) => {
     // se a quantidade for 0, remover o equipamento da sala
     if (qtd_ === 0) {
       // verifica se há reservas ativas antes de excluir
-      const hasActiveReservations = await Reserva.findOne({
-              equipSalaId:  equipSala._id,
-              statusReserva: { $ne: 'cancelada' },
-              dataReserva: { $gte: new Date() }
-            });
+      const hasActiveReservations = await equipHasActiveReservations(equipSala._id);
 
       if (hasActiveReservations) {
         return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
@@ -244,6 +236,20 @@ const getAllEquipSala = async (req, res) => {
   }
 };
 
+const equipHasActiveReservations = async (equipSalaId) => {
+  const hasActiveReservations = await Reserva.findOne({
+    equipSalaId: equipSalaId,
+    status: { $ne: 'cancelada' },
+    dataReserva: { $gte: new Date().toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+    }
+  });
+  return hasActiveReservations;
+}
+
 // Metodos auxiliares
 const getSalaIdByName = async (sala) => {
   const salaObj = await Room.findOne({ identificador: sala });
@@ -263,5 +269,6 @@ module.exports = {
   getEquipamentosInSala,
   getAllEquipSala,
   getSalaIdByName,
-  getEquipIdByName
+  getEquipIdByName,
+  equipHasActiveReservations
 };

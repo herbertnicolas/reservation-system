@@ -36,7 +36,7 @@ Feature: Adicionar, editar e remover equipamentos de sala
         And eu adiciono o equipamento "Impressora" para a sala "E104" sem quantidade
         And eu seleciono "Adicionar Equipamento"
         Then o sistema rejeita a operação retornando a mensagem "Preencha todos os campos"
-        And eu permaneço na página de "Cadastrar Equipamento"
+        And eu permaneço na página de Cadastro de Equipamentos
 
     Scenario: Remover um equipamento de uma sala
         Given que eu estou na página de Gestão de Equipamentos
@@ -47,7 +47,7 @@ Feature: Adicionar, editar e remover equipamentos de sala
         And eu confirmo a remoção selecionando "Remover"
         Then o sistema aceita a operação retornando a mensagem "Equipamento removido da sala com sucesso!"
         And o equipamento "Impressora" não aparece na lista da sala "E104"
-        And eu permaneço na página de "Gestão de Equipamentos"
+        And eu permaneço na página de Gestão de Equipamentos
 
     Scenario: Adicionar um equipamento já existente
         Given que eu estou na página de Gestão de Equipamentos
@@ -62,4 +62,13 @@ Feature: Adicionar, editar e remover equipamentos de sala
         And eu sou redirecionado para a página de Gestão de Equipamentos
         And eu posso ver o equipamento "Projetor" da sala "E233" com quantidade "3"
 
-    
+    Scenario: Ordenar por salas
+        Given que eu estou na página de Gestão de Equipamentos
+        And os seguintes equipamentos estão cadastrados:
+        | Sala    | Equipamento     | Quantidade |
+        | E233    | Projetor        | 3          |
+        | D003    | Cadeira         | 30         |
+        | Grad01  | Computador      | 15         |
+        When eu seleciono a opção de ordenar por salas
+        Then eu vejo os equipamentos seguindo a ordem salas
+        And eu permaneço na página de Gestão de Equipamentos
