@@ -79,7 +79,7 @@ const removeEquipamentoFromSala = async (req, res) => {
     // verifica se há reservas ativas para esse equipamento nessa sala
     const hasActiveReservations = await equipHasActiveReservations(equipSala._id);
 
-    if (hasActiveReservations) {
+    if (hasActiveReservations || equipSala.datasReservas.length > 0) {
       return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
     }
     
@@ -125,7 +125,7 @@ const updateEquipamentoInSala = async (req, res) => {
       // verifica se há reservas ativas antes de excluir
       const hasActiveReservations = await equipHasActiveReservations(equipSala._id);
 
-      if (hasActiveReservations) {
+      if (hasActiveReservations || equipSala.datasReservas.length > 0) {
         return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
       }
 
