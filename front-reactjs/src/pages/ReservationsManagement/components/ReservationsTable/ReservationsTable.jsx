@@ -19,7 +19,7 @@ export function ReservationsTable({ reservations, onEdit }) {
             reservations.map((reservation) => (
               <TableRow key={reservation._id}>
                 <TableCell>{reservation._id}</TableCell>
-                <TableCell>{reservation.type}</TableCell>
+                <TableCell>{reservation.tipo}</TableCell>
                 <TableCell>{reservation.statusReserva}</TableCell>
                 <TableCell>
                   <Button

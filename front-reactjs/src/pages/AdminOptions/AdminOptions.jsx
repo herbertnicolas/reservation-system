@@ -66,7 +66,7 @@ export default function ManageOptions() {
             <Grid item xs={12} md={6}>
               <Paper 
                 id="card-verificar-reservas"
-                onClick={() => navigate('/gestao-reservas')}
+                onClick={() => navigate('/gerenciamento-reservas')}
                 elevation={2} 
                 sx={{ 
                   borderRadius: '16px',

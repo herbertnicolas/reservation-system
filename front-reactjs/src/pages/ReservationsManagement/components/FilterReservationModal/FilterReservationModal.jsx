@@ -37,9 +37,9 @@ export function FilterReservationModal({ isOpen, onClose, onApplyFilter }) {
               className="w-full p-2 border rounded-md"
             >
               <option value="">Selecione status</option>
-              <option value="Confirmada">Confirmada</option>
-              <option value="Cancelada">Cancelada</option>
-              <option value="Pendente">Pendente</option>
+              <option value="confirmada">Confirmada</option>
+              <option value="cancelada">Cancelada</option>
+              <option value="pendente">Pendente</option>
             </select>
           </div>
 

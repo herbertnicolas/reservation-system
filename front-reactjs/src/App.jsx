@@ -42,7 +42,7 @@ const App = () => {
         <Route path="/equipamento-cadastro" element={<CDEquipForm />} /> 
         <Route path="/equipamento-edicao/:id" element={<EditEquipForm />} /> 
         {/*RESERVAS*/}
-        <Route path="/gestao-reservas" element={<ReservationsManagement />} />
+        <Route path="/gerenciamento-reservas" element={<ReservationsManagement />} />
         {/* HISTORICO */}
         <Route path="/historico" element={<HistoryManagement />} />
         <Route path="/historico/buscar" element={<SearchHistory />} />
