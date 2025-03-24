@@ -118,8 +118,9 @@ Then("uma mensagem de {string} deve ser exibida", (mensagem) => {
 });
 
 Then("uma mensagem de erro {string} deve ser exibida", (mensagem) => {
-  cy.get("[role='dialog']").should("be.visible");
-  cy.get(".rounded-md.border").should("be.visible");
+  cy.get('.Toastify__toast--error')
+  .should('be.visible')
+  .and('contain.text', mensagem);
 });
 
 When("fecha o toast de confirmação", () => {
