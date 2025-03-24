@@ -45,6 +45,7 @@ export function ConfirmReservationModal({
           </DialogDescription> */}
           <div className="justify-center mt-4">
             <Calendar
+              id="calendar"
               mode="single"
               selected={date}
               onSelect={setDate}
@@ -57,6 +58,7 @@ export function ConfirmReservationModal({
               Cancelar
             </Button>
             <Button
+              id="confirm-button"
               style={{
                 backgroundColor: "#000",
                 color: "#fff",
