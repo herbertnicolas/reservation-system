@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { PrivateLayout } from "../../components/PrivateLayout/PrivateLayout";
 import { NotebookPen, LaptopMinimalCheck } from "lucide-react";
 
-export default function ResourceOptions() {
+export default function ResourcesOptions() {
   const navigate = useNavigate();
-
+  
   return (
 <>
       <PrivateLayout>

@@ -35,7 +35,7 @@ export default function ManageOptions() {
             <Grid item xs={12} md={6}>
               <Paper 
                 id="card-recursos"
-                onClick={() => navigate('/gestao-salas')}
+                onClick={() => navigate('/opcoes-recurso')}
                 elevation={2} 
                 sx={{ 
                   borderRadius: '16px',
