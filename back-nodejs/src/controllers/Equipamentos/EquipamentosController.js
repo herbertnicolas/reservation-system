@@ -67,8 +67,9 @@ const criarEquipamento = async (req, res) => {
 
     const exists = await Equipamento.findOne({nome});
     if (exists){
-      return res.status(400).json({
-        msg:'Equipamento Já existe'
+      return res.status(200).json({
+        msg:'Equipamento Já existe',
+        data: exists
       })
     }
 
