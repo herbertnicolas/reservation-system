@@ -110,7 +110,12 @@ const deleteEquipamento = async (req, res) => {
       const hasActiveReservations = await Reserva.findOne({
         equipSalaId: { $in: equipSalas.map(es => es._id) },
         status: { $ne: 'cancelada' },
-        dataReserva: { $gte: new Date() }
+        dataReserva: { $gte: new Date().toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          })
+        }
       });
 
       if (hasActiveReservations) {
