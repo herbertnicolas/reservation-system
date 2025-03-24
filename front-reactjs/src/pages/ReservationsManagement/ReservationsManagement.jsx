@@ -15,7 +15,7 @@ function ReservationsManagement() {
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [reservations, setReservations] = useState([]);
-  const [filteredStatus, setFilteredStatus] = useState([]);
+  const [filteredStatus, setFilteredStatus] = useState("");
 
   const fetchReservations = async (status = "") => {
     try {
@@ -24,7 +24,7 @@ function ReservationsManagement() {
       ? `http://localhost:3001/verificarreservas/status?status=${status}`
       : `http://localhost:3001/verificarreservas`;
       const response = await fetch(endpoint);
-      if (!responde.ok) {
+      if (!response.ok) {
         const errorData = await responde.json();
         throw new Error(errorData.msg || "Erro ao carregar reservas.")
       }
@@ -52,52 +52,37 @@ function ReservationsManagement() {
     setSelectedReservation(null);
   };
 
-  // confirmar a reserva
-  const handleConfirm = async (id) => {
+  const updateReservationStatus = async (id, status) => {
     try {
       const response = await fetch(`http://localhost:3001/verificarreservas/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ statusReserva: 'confirmada' }),
+        body: JSON.stringify({ statusReserva: status }),
       });
-      
+  
       if (response.ok) {
-        toast.success("Status da reserva atualizado!");
+        toast.success(`Status da reserva atualizado para '${status}'.`);
         fetchReservations(filteredStatus);
         handleCloseModal();
       } else {
         const errorData = await response.json();
-        throw new Error(data.msg || 'Erro ao atualizar status.');
+        throw new Error(errorData.msg || 'Erro ao atualizar status.');
       }
     } catch (error) {
-      toast.error(`Erro ao confirmar reserva: ${error.message}`);
+      toast.error(`Erro ao atualizar reserva: ${error.message}`);
     }
+  };
+
+  // confirmar a reserva
+  const handleConfirm = async (id) => {
+    await updateReservationStatus(id, "confirmada");
   };
 
   // cancelar a reserva
   const handleCancel = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:3001/verificarreservas/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ statusReserva: 'cancelada' }),
-      });
-
-      if (response.ok) {
-        toast.success("Status da reserva atualizado com sucesso!");
-        fetchReservations(filteredStatus);
-        handleCloseModal();
-      } else {
-        const errorData = await response.json();
-        throw new Error(data.msg || 'Erro ao atualizar status.');
-      }
-    } catch (error) {
-      toast.error(`Erro ao cancelar reserva: ${error.message}`);
-    }
+    await updateReservationStatus(id, "cancelada");
   };
 
   // filtro
