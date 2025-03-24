@@ -72,3 +72,14 @@ Feature: Adicionar, editar e remover equipamentos de sala
         When eu seleciono a opção de ordenar por salas
         Then eu vejo os equipamentos seguindo a ordem salas
         And eu permaneço na página de Gestão de Equipamentos
+
+    Scenario: Tentar remover equipamento de sala com reservas associadas
+        Given que eu estou na página de Gestão de Equipamentos
+        And os seguintes equipamentos estão cadastrados:
+            | Sala    | Equipamento     | Quantidade |
+            | Grad01  | Computador      | 15         |
+        And o equipamento "Computador" da sala "Grad01" possui uma reserva ativa
+        When eu seleciono a opção de remover do equipamento "Computador" da sala "Grad01"
+        And eu confirmo a remoção selecionando "Remover"
+        Then o sistema rejeita a operação retornando a mensagem "Não foi possível remover: Equipamento com reservas ativas"
+        And eu permaneço na página de Gestão de Equipamentos

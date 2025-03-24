@@ -1,6 +1,14 @@
 const { Given, When, Then } = require("cypress-cucumber-preprocessor/steps");
 const API_URL = 'http://localhost:3001'; 
 
+const formatDate = (date) => {
+  return date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+};
+
 Given("que eu estou na página de Gestão de Equipamentos", () => {
     cy.intercept('GET', `${API_URL}/equipsala*`).as('getEquipamentos');
     cy.visit(`http://localhost:5173/equipamento-gestao`);
@@ -26,6 +34,24 @@ Given("os seguintes equipamentos estão cadastrados:", (dataTable) => {
           .and('contain', row.Equipamento)
           .and('contain', row.Quantidade);
     });
+});
+
+Given("o equipamento {string} da sala {string} possui uma reserva ativa", (equipamento, sala) => {
+  // Get equipSala ID first
+  cy.request('GET', `${API_URL}/equipsala`)
+      .then((response) => {
+          const equipSala = response.body.data.find(
+              es => es.equipamento.nome === equipamento && es.sala.identificador === sala
+          );
+          // Create reservation for the equipment
+          cy.request('POST', `${API_URL}/reservas`, {
+              tipo:'equipamento',
+              salaId: equipSala.sala._id,
+              equipamentoId: equipSala.equipamento._id,
+              status: 'pendente',
+              dataReserva: formatDate(new Date())
+          });
+      });
 });
 
 When("eu seleciono {string}", (option) => {

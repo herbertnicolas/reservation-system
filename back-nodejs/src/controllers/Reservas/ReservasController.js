@@ -66,7 +66,7 @@ const criarReserva = async (req, res) => {
       recurso = await Salas.findById(salaId);
       model = Salas;
     }
-
+    
     if (tipo === "equipamento") {
       // busca a relacao equipamento-sala
       recurso = await EquipSala.findOne({
