@@ -30,6 +30,7 @@ Feature: Verificar Reservas
     Scenario: Filtrar reservas pendentes
           When o usuário seleciona o botão "Filtrar Reservas"
           And o modal de filtragem de reservas por status é exibido
-          And o usuário seleciona o status "Pendente"
-          And o usuário clica no botão "Aplicar Filtro"
-          Then a tabela de reservas exibe somente reservas com o status "Pendente"
+          And o usuário seleciona o status "pendente"
+          And o usuário pressiona o botão "Aplicar Filtro"
+          Then a tabela de reservas exibe somente reservas com o status "pendente"
+

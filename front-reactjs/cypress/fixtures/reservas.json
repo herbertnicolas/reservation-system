@@ -1,0 +1,44 @@
+[
+    {
+      "_id": "1",
+      "nome": "Reserva 1",
+      "tipo": "Sala",
+      "statusReserva": "pendente"
+    },
+    {
+      "_id": "2",
+      "nome": "Reserva 2",
+      "tipo": "Equipamento",
+      "statusReserva": "confirmada"
+    },
+    {
+      "_id": "3",
+      "nome": "Reserva 3",
+      "tipo": "Sala",
+      "statusReserva": "cancelada"
+    },
+    {
+      "_id": "4",
+      "nome": "Reserva 4",
+      "tipo": "Equipamento",
+      "statusReserva": "pendente"
+    },
+    {
+      "_id": "5",
+      "nome": "Reserva 5",
+      "tipo": "Sala",
+      "statusReserva": "confirmada"
+    },
+    {
+      "_id": "6",
+      "nome": "Reserva 6",
+      "tipo": "Sala",
+      "statusReserva": "pendente"
+    },
+    {
+      "_id": "7",
+      "nome": "Reserva 7",
+      "tipo": "Equipamento",
+      "statusReserva": "cancelada"
+    }
+  ]
