@@ -9,6 +9,10 @@ const formatDate = (date) => {
   })
 };
 
+Given("eu estou na página inicial", () => {
+  cy.visit("http://localhost:5173/");
+});
+
 Given("que eu estou na página de Gestão de Equipamentos", () => {
     cy.intercept('GET', `${API_URL}/equipsala*`).as('getEquipamentos');
     cy.visit(`http://localhost:5173/equipamento-gestao`);
@@ -52,6 +56,18 @@ Given("o equipamento {string} da sala {string} possui uma reserva ativa", (equip
               dataReserva: formatDate(new Date())
           });
       });
+});
+
+When("eu seleciono a aba Administrador", () => {
+    cy.get('#card-administrador').click();
+});
+
+When("eu seleciono a aba Gerenciar recursos", () => {
+    cy.get('#card-recursos').click();
+});
+
+When("eu seleciono a aba Equipamentos", () => {
+    cy.get('#card-equipamentos').click();
 });
 
 When("eu seleciono {string}", (option) => {
@@ -156,7 +172,6 @@ Then("o sistema rejeita a operação retornando a mensagem {string}", (msg) => {
 });
 
 Then("eu sou redirecionado para a página de Gestão de Equipamentos", () => {
-    cy.wait('@getEquipamentos');
     cy.url().should('include', 'equipamento-gestao');
 });
 

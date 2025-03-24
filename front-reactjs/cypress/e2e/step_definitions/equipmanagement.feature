@@ -3,6 +3,13 @@ Feature: Adicionar, editar e remover equipamentos de sala
     I Want to gerenciar equipamentos das salas
     So that eu possa manter o controle dos recursos disponíveis
 
+    Scenario: Navegar até a página de gestão de equipamentos
+        Given eu estou na página inicial
+        When eu seleciono a aba Administrador
+        And eu seleciono a aba Gerenciar recursos
+        And eu seleciono a aba Equipamentos   
+        Then eu sou redirecionado para a página de Gestão de Equipamentos
+
     Scenario: Adicionar um novo equipamento a uma sala
         Given que eu estou na página de Gestão de Equipamentos
         And a sala "E233" não possui equipamentos cadastrados
@@ -77,9 +84,9 @@ Feature: Adicionar, editar e remover equipamentos de sala
         Given que eu estou na página de Gestão de Equipamentos
         And os seguintes equipamentos estão cadastrados:
             | Sala    | Equipamento     | Quantidade |
-            | Grad01  | Computador      | 15         |
-        And o equipamento "Computador" da sala "Grad01" possui uma reserva ativa
-        When eu seleciono a opção de remover do equipamento "Computador" da sala "Grad01"
+            | E233    | Projetor        | 3         |
+        And o equipamento "Projetor" da sala "E233" possui uma reserva ativa
+        When eu seleciono a opção de remover do equipamento "Projetor" da sala "E233"
         And eu confirmo a remoção selecionando "Remover"
         Then o sistema rejeita a operação retornando a mensagem "Não foi possível remover: Equipamento com reservas ativas"
         And eu permaneço na página de Gestão de Equipamentos
