@@ -3,8 +3,10 @@ import {
   AudioWaveform,
   Command,
   GalleryVerticalEnd,
+  Inbox,
   LucideWrench,
   Monitor,
+  NotebookPen,
   PieChart,
   SquareTerminal,
   Users,
@@ -94,7 +96,7 @@ export function AppSidebar({ ...props }) {
       {
         title: "Reservas",
         url: "/reservas",
-        icon: PieChart,
+        icon: Inbox,
         items: [
           {
             title: "Reserva de sala",
@@ -104,6 +106,10 @@ export function AppSidebar({ ...props }) {
             title: "Reserva de equipamento",
             url: "/reservar-equipamento",
           },
+          {
+            title: "Gerenc. de Reservas",
+            url: "/gestao-reservas",
+          },
         ],
       },
     ],
@@ -111,7 +117,7 @@ export function AppSidebar({ ...props }) {
       {
         title: "Histórico",
         url: "/historico",
-        icon: AudioWaveform,
+        icon: NotebookPen,
         items: [
           {
             title: "Histórico de Reservas",
