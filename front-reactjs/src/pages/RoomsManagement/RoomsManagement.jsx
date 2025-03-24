@@ -22,15 +22,27 @@ export default function RoomsManagement({ children }) {
   const [selectedRoomId, setSelectedRoomId] = useState(null);
 
   const confirmDelete = async () => {
-    await fetch(`http://localhost:3001/salas/${selectedRoomId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    });
-    setIsModalOpen(false);
-    // Atualize a lista de usuários aqui
-    toast.success("Sala excluída com sucesso!");
+    try {
+      const response = await fetch(`http://localhost:3001/salas/${selectedRoomId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || `Erro ${response.status}: ${response.statusText}`);
+      }
+  
+      setIsModalOpen(false);
+      fetchRooms();
+      toast.success("Sala excluída com sucesso!");
+    } catch (error) {
+      toast.error(error.message.replace("Error: ", "")); // Remove prefixo 'Error:'
+      setIsModalOpen(false);
+    }
   };
-
+  
   const [roomsData, setRoomsData] = useState([]);
 
   async function getRooms() {
@@ -99,7 +111,8 @@ export default function RoomsManagement({ children }) {
           <>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
+                <Button variant="ghost" className="h-8 w-8 p-0"
+                data-testid={`botao-opcoes-${row.original._id}`}>
                   {/* <span className="sr-only">Open menu</span> */}
                   <MoreVertical className="h-4 w-4" />
                 </Button>
@@ -109,6 +122,7 @@ export default function RoomsManagement({ children }) {
                 style={{ backgroundColor: "white" }}
               >
                 <DropdownMenuItem
+                  data-testid={`botao-editar-${row.original._id}`}
                   className="cursor-pointer hover:bg-gray-100"
                   onClick={() => navigate(`/editar-sala/${row.original._id}`)}
                 >
@@ -116,6 +130,7 @@ export default function RoomsManagement({ children }) {
                   Editar
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  data-testid={`botao-excluir-${row.original._id}`}
                   className="cursor-pointer hover:bg-gray-100"
                   onClick={() => {
                     setIsModalOpen(true);

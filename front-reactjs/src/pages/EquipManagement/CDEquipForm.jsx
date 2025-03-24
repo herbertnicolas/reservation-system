@@ -7,6 +7,8 @@ import { ChevronLeft } from "lucide-react";
 import { useEquip } from "@/hooks/use-equip";
 import { equipSalaService } from "@/services/equipSalaService";
 
+import { BaseEquipDelete } from './components/BaseEquipDelete';
+
 import { PrivateLayout } from "@/components/PrivateLayout/PrivateLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,9 +23,9 @@ import {
 } from "@/components/ui/select";
 
 
-export default function AddEquipForm() {
+export default function CDEquipForm() {
   const navigate = useNavigate();
-  const { equipamentos } = useEquip();
+  const { equipamentos, refetch } = useEquip();
   const [salas, setSalas] = useState([]);
   const [formData, setFormData] = useState({
     salaId: "",
@@ -85,9 +87,7 @@ export default function AddEquipForm() {
           }}
         >
           <Grid2 size={12}>
-            <Typography variant="h4">
-              Adicionar Equipamento
-            </Typography>
+            <Typography variant="h4">Cadastrar Equipamento</Typography>
             <Divider />
           </Grid2>
 
@@ -179,6 +179,15 @@ export default function AddEquipForm() {
           </Grid2>
         </Grid2>
       </Grid2>
+      <Grid2 size={12} className="mt-20">
+        <Typography variant="h6">Remover Equipamento da Base de Dados</Typography>
+        <div className="mt-4">
+          <BaseEquipDelete 
+            equipamentos={equipamentos} 
+            onEquipamentoDeleted={() => { refetch; }} 
+          />
+        </div>
+      </Grid2 >
     </PrivateLayout>
   );
 }

@@ -77,17 +77,21 @@ const removeEquipamentoFromSala = async (req, res) => {
     }
     
     // verifica se há reservas ativas para esse equipamento nessa sala
-    const reservas = await Reserva.find({tipo: 'equipamento', equipSalaId: equipamentoId, salaId: salaId}) 
+    const hasActiveReservations = await Reserva.findOne({
+      equipSalaId: equipSala._id,
+      status: { $ne: 'cancelada' },
+      dataReserva: { $gte: new Date() }
+    });
 
-    if (reservas.length > 0) {
+    if (hasActiveReservations) {
       return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
     }
     
-    const removedInst = await EquipSala.findOneAndDelete(equipSala._id);
+    await EquipSala.findOneAndDelete(equipSala._id);
     
     return res.status(200).json({ 
       msg: 'Equipamento removido da sala com sucesso',
-      data: removedInst
+      data: equipSala
     });
 
   } catch (error) {
@@ -123,7 +127,13 @@ const updateEquipamentoInSala = async (req, res) => {
     // se a quantidade for 0, remover o equipamento da sala
     if (qtd_ === 0) {
       // verifica se há reservas ativas antes de excluir
-      if (equipSala.datasReservas.length > 0) {
+      const hasActiveReservations = await Reserva.findOne({
+              equipSalaId:  equipSala._id,
+              statusReserva: { $ne: 'cancelada' },
+              dataReserva: { $gte: new Date() }
+            });
+
+      if (hasActiveReservations) {
         return res.status(400).json({ msg: 'Não foi possível remover: Equipamento com reservas ativas' });
       }
 
@@ -205,7 +215,7 @@ const getAllEquipSala = async (req, res) => {
       });
     }
 
-    let bodyData = [];
+    const bodyData = [];
     for (let equipSala of equipamentos) {
       bodyData.push({
         equipamento: {

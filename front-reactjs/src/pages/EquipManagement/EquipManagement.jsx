@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import { equipSalaService } from "@/services/equipSalaService";
+
 import { DataTableEquip } from "./components/Table/DataTableEquip";
 import { columns } from "./components/Table/Columns";
-import { DeleteConfirmationDialog } from "./components/DeleteConfirmation";
+import { DeleteConfirmation } from "../../components/DeleteConfirmation";
 
 import { Grid2, Typography } from "@mui/material";
 import { PrivateLayout } from "@/components/PrivateLayout/PrivateLayout";
@@ -19,7 +21,7 @@ import {
 
 export default function EquipManagement() {
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedEquipId, setSelectedEquipId] = useState(null);
   const [selectedSalaId, setSelectedSalaId] = useState(null);
   const [equipmentData, setEquipmentData] = useState([]);
@@ -28,41 +30,26 @@ export default function EquipManagement() {
     navigate(`/equipamento-edicao/${equipId}`);
   };
 
-  const confirmDelete = async () => {
+  const handleDelete = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3001/equipsala/${selectedSalaId}/${selectedEquipId}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erro ao deletar equipamento");
-      }
-
-      setIsModalOpen(false);
-      toast.success("Equipamento removido com sucesso!");
+      await equipSalaService.removeEquipamento(selectedSalaId, selectedEquipId);
+      
+      setIsDeleteModalOpen(false);
+      toast.success("Equipamento removido da sala com sucesso!");
       fetchEquipments();
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  async function getEquipments() {
-    const response = await fetch("http://localhost:3001/equipsala");
-    return response.json();
-  }
-
-  async function fetchEquipments() {
+  const fetchEquipments = async () => {
     try {
-      const data = await getEquipments();
-      setEquipmentData(data.data);
+      const response = await equipSalaService.getAllEquipSala();
+      setEquipmentData(response.data);
     } catch (error) {
-      toast.error("Erro ao carregar equipamentos");
+      toast.error(error.message);
     }
-  }
+  };
 
   useEffect(() => {
     fetchEquipments();
@@ -92,7 +79,7 @@ export default function EquipManagement() {
             onClick={() => {
               setSelectedEquipId(equiproom.equipamento._id);
               setSelectedSalaId(equiproom.sala._id);
-              setIsModalOpen(true);
+              setIsDeleteModalOpen(true);
             }}
           >
             <Trash className="mr-2 h-4 w-4" style={{ color: "red" }} />
@@ -119,12 +106,14 @@ export default function EquipManagement() {
           </Grid2>
         </Grid2>
       </PrivateLayout>
-      {isModalOpen && (
-        <DeleteConfirmationDialog
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onConfirm={confirmDelete}
-        />
+      {isDeleteModalOpen && (
+        <DeleteConfirmation
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Deseja realmente remover este equipamento da sala?"
+        description="O equipamento continuará disponível para ser adicionado novamente a esta ou outras salas."
+    />
       )}
     </>
   );
